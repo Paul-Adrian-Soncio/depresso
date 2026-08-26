@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+:root,
+[data-period="morning"] {
+  --ground: #E7EAEC;
+  --surface: #F3F5F6;
+  --surface-2: #E1E5E7;
+  --ink: #1E2429;
+  --ink-2: #4C575F;
+  --ink-3: #58636B;
+  --accent: #B26A20;
+  --accent-text: #8A5114;
+  --on-accent: #FBF6EF;
+  --cool: #4A6E7E;
+  --line: #D6DCDF;
+  --line-strong: #B9C2C8;
+  --ok: #4E7F5B;
+}
+
+[data-period="afternoon"] {
+  --ground: #DFE4E7;
+  --surface: #EEF1F3;
+  --surface-2: #D9DFE2;
+  --ink: #1B2126;
+  --ink-2: #47525A;
+  --ink-3: #525C64;
+  --accent: #A8631D;
+  --accent-text: #834C12;
+  --on-accent: #FBF6EF;
+  --cool: #436674;
+  --line: #CED5D9;
+  --line-strong: #B2BCC2;
+  --ok: #487754;
+}
+
+[data-period="dusk"] {
+  --ground: #232C33;
+  --surface: #2C363E;
+  --surface-2: #29323A;
+  --ink: #E2E8EC;
+  --ink-2: #B4BEC6;
+  --ink-3: #8C99A3;
+  --accent: #E3903F;
+  --accent-text: #E3903F;
+  --on-accent: #1B2126;
+  --cool: #6E9AAC;
+  --line: #313C45;
+  --line-strong: #46525C;
+  --ok: #7FB08A;
+}
+
+[data-period="late"] {
+  --ground: #10161B;
+  --surface: #171E24;
+  --surface-2: #141A20;
+  --ink: #D9E1E6;
+  --ink-2: #A3AFB7;
+  --ink-3: #78848D;
+  --accent: #F0A24E;
+  --accent-text: #F0A24E;
+  --on-accent: #14100A;
+  --cool: #5F8B9C;
+  --line: #202932;
+  --line-strong: #33404A;
+  --ok: #74A67F;
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-on-accent: var(--on-accent);
+  --color-cool: var(--cool);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ok: var(--ok);
+  --font-display: var(--font-bricolage), 'Trebuchet MS', sans-serif;
+  --font-body: var(--font-newsreader), Georgia, 'Times New Roman', serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, Menlo, monospace;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
