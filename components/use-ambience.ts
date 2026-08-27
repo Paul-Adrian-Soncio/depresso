@@ -57,8 +57,13 @@ function loadStoredMuted(): AmbienceMuted {
  * happened yet, for UI that wants to hint "click a slider to start".
  */
 export function useAmbience() {
-  const [mix, setMix] = useState<AmbienceMix>(loadStoredMix);
-  const [muted, setMuted] = useState<AmbienceMuted>(loadStoredMuted);
+  // Server and first client paint must match, so state starts at the
+  // deterministic defaults (never localStorage) and is corrected to the
+  // stored mix in an effect once mounted. Reading localStorage in the
+  // initializer caused a hydration mismatch whenever a saved mix differed
+  // from the defaults.
+  const [mix, setMix] = useState<AmbienceMix>(defaultMix);
+  const [muted, setMuted] = useState<AmbienceMuted>(defaultMuted);
   const [started, setStarted] = useState(false);
   const [loadErrors, setLoadErrors] = useState<Partial<Record<AmbienceTrackId, boolean>>>({});
 
@@ -69,15 +74,42 @@ export function useAmbience() {
   const mixRef = useRef<AmbienceMix>(mix);
   const mutedRef = useRef<AmbienceMuted>(muted);
   const startPromiseRef = useRef<Promise<AudioContext> | null>(null);
+  // Persistence effects below must not write back to localStorage until
+  // after the hydration-correction effect has applied the stored value —
+  // otherwise the mount render's default state overwrites it. Both refs
+  // start "skip" and flip once, in mount order.
+  const skipMixWriteRef = useRef(true);
+  const skipMutedWriteRef = useRef(true);
+
+  useEffect(() => {
+    const storedMix = loadStoredMix();
+    const storedMuted = loadStoredMuted();
+    mixRef.current = storedMix;
+    mutedRef.current = storedMuted;
+    // Correcting SSR-safe defaults to the real localStorage value after
+    // mount, not deriving state from props — the one-time setState here is
+    // the standard fix for this class of hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMix(storedMix);
+    setMuted(storedMuted);
+  }, []);
 
   useEffect(() => {
     mixRef.current = mix;
+    if (skipMixWriteRef.current) {
+      skipMixWriteRef.current = false;
+      return;
+    }
     if (typeof window === "undefined") return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(mix));
   }, [mix]);
 
   useEffect(() => {
     mutedRef.current = muted;
+    if (skipMutedWriteRef.current) {
+      skipMutedWriteRef.current = false;
+      return;
+    }
     if (typeof window === "undefined") return;
     window.localStorage.setItem(MUTED_STORAGE_KEY, JSON.stringify(muted));
   }, [muted]);
