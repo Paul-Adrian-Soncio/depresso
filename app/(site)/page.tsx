@@ -1,13 +1,17 @@
 import { PeriodSwitcher } from "@/components/period-switcher";
 import { HeroCopy } from "@/components/hero-copy";
 import { AmbientMixer } from "@/components/ambient-mixer";
+import { Mascot } from "@/components/mascot";
 
 export default function Home() {
   return (
     <>
       <header className="flex items-center justify-between px-8 py-6">
-        <span className="font-display text-lg font-bold tracking-[-0.02em] text-ink">
-          Depresso
+        <span className="flex items-center gap-2">
+          <Mascot className="h-12 w-auto" />
+          <span className="font-display text-lg font-bold tracking-[-0.02em] text-ink">
+            Depresso
+          </span>
         </span>
         <PeriodSwitcher />
       </header>
