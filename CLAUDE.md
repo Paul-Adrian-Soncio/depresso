@@ -60,14 +60,14 @@ scales.
 }
 [data-period="dusk"] {
   --ground: #232C33;  --surface: #2C363E;  --surface-2: #29323A;
-  --ink: #E2E8EC;     --ink-2: #B4BEC6;    --ink-3: #8C99A3;
+  --ink: #E2E8EC;     --ink-2: #B4BEC6;    --ink-3: #939FA9;
   --accent: #E3903F;  --accent-text: #E3903F;  --on-accent: #1B2126;
   --cool: #6E9AAC;    --line: #313C45;     --line-strong: #46525C;
   --ok: #7FB08A;
 }
 [data-period="late"] {
   --ground: #10161B;  --surface: #171E24;  --surface-2: #141A20;
-  --ink: #D9E1E6;     --ink-2: #A3AFB7;    --ink-3: #78848D;
+  --ink: #D9E1E6;     --ink-2: #A3AFB7;    --ink-3: #7E8992;
   --accent: #F0A24E;  --accent-text: #F0A24E;  --on-accent: #14100A;
   --cool: #5F8B9C;    --line: #202932;     --line-strong: #33404A;
   --ok: #74A67F;
@@ -97,6 +97,14 @@ Usage:
 - **Mono** — labels, eyebrows, prices, times, counts, any tabular data. Uppercase
   with `0.10–0.16em` letter-spacing. Use `font-variant-numeric: tabular-nums`
   wherever digits line up in a column.
+
+**Filled-accent buttons must be `font-weight: 700`, not 500.** `--on-accent` on
+`--accent` fails normal-text AA contrast in the two light periods (3.93:1 and
+4.37:1 against the 4.5:1 threshold) — it only clears WCAG's large-text
+carve-off at bold weight and ~15px+. Small filled-accent controls below that
+size (e.g. the period switcher's active pill) are exempt as UI components
+under WCAG 1.4.11 (3:1, which the pair clears in every period) rather than
+text — don't force them bold just to chase the text threshold.
 
 ---
 

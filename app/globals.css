@@ -39,7 +39,7 @@
   --surface-2: #29323A;
   --ink: #E2E8EC;
   --ink-2: #B4BEC6;
-  --ink-3: #8C99A3;
+  --ink-3: #939FA9;
   --accent: #E3903F;
   --accent-text: #E3903F;
   --on-accent: #1B2126;
@@ -55,7 +55,7 @@
   --surface-2: #141A20;
   --ink: #D9E1E6;
   --ink-2: #A3AFB7;
-  --ink-3: #78848D;
+  --ink-3: #7E8992;
   --accent: #F0A24E;
   --accent-text: #F0A24E;
   --on-accent: #14100A;
@@ -82,12 +82,72 @@
   --font-display: var(--font-bricolage), 'Trebuchet MS', sans-serif;
   --font-body: var(--font-newsreader), Georgia, 'Times New Roman', serif;
   --font-mono: var(--font-dm-mono), ui-monospace, Menlo, monospace;
+
+  /* Radii — small and tight, never the default rounded-xl jump. */
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 5px;
+  --radius-xl: 6px;
+
+  /* Motion — quiet and unhurried. `period` is the cross-fade when the
+     time-of-day theme swaps; everything else is ordinary UI feedback. */
+  --ease-quiet: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --duration-period: 700ms;
 }
 
 body {
   background: var(--ground);
   color: var(--ink);
   font-family: var(--font-display);
+}
+
+/*
+ * The period cross-fade: when <html data-period> swaps, every element eases
+ * to its new token-driven colors instead of cutting. Placed in Tailwind's
+ * `base` layer so any utility class (`transition-colors`, `duration-*`, ...)
+ * outranks it by layer order and can set its own faster transition without
+ * fighting a same-specificity, later-in-source rule.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    transition:
+      background-color var(--duration-period) var(--ease-quiet),
+      color var(--duration-period) var(--ease-quiet),
+      border-color var(--duration-period) var(--ease-quiet),
+      fill var(--duration-period) var(--ease-quiet),
+      stroke var(--duration-period) var(--ease-quiet);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 50;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  transition: top var(--duration-base) var(--ease-quiet);
+}
+
+.skip-link:focus-visible {
+  top: 1rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -98,5 +158,18 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /*
+   * The period cross-fade is a state change, not decoration — degrade it to
+   * a quick, still-perceptible fade rather than an instant cut. Everything
+   * else (the blanket rule above) goes to near-zero as usual.
+   */
+  @layer base {
+    *,
+    *::before,
+    *::after {
+      transition-duration: var(--duration-fast) !important;
+    }
   }
 }

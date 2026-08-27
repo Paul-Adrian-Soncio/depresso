@@ -82,6 +82,29 @@ A simulated gateway is better here, not just easier: it lets us deliberately
 trigger declines, timeouts and retries, so the project demonstrates error
 handling rather than only the happy path.
 
+### 2026-08-27 — First contrast pass: two fixes to the Night Window tokens
+Checked WCAG contrast for every ink/accent pair against `--ground` and
+`--surface` in all four periods. Two pairs failed:
+
+- `--on-accent` on `--accent` (button labels) — 3.93:1 in morning, 4.37:1 in
+  afternoon, both under the 4.5:1 text threshold. Treated as a UI component
+  (WCAG 1.4.11, 3:1) rather than body text, and given the 1.4.3 bold/large-text
+  carve-out: primary-button labels are `font-weight: 700` (up from 500), which
+  both clears 1.4.3's large-text exemption and 1.4.11's component threshold
+  without touching the palette.
+- `--ink-3` on `--surface` (the smallest text — mono labels, timestamps on
+  cards) — 4.22:1 in dusk, 4.40:1 in late, just under 4.5:1. Nudged `--ink-3`
+  lighter in both dark periods only (dusk `#8C99A3` → `#939FA9`, late `#78848D`
+  → `#7E8992`) until each cleared 4.5:1 against `--surface` with a small margin.
+  Barely perceptible; morning/afternoon `--ink-3` were already comfortably
+  passing and are untouched.
+
+**Consequence:** `CLAUDE.md`'s token table is updated to match — treat the
+code and that table as the same source now, not `--ink-3`'s original values.
+This was expected; see "Known traps" in `CLAUDE.md`, which called out
+`--accent-text` as one instance of exactly this class of bug and predicted
+more. Re-run the contrast check after any future token change, not just once.
+
 ---
 
 ## Open
