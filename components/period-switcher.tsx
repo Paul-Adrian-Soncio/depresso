@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { PERIODS, type Period } from "@/lib/domain/period";
+import { usePeriodContext } from "@/components/period-provider";
 
 const LABELS: Record<Period, string> = {
   morning: "Morn",
@@ -10,17 +11,13 @@ const LABELS: Record<Period, string> = {
   late: "Late",
 };
 
-export function PeriodSwitcher({ initial }: { initial: Period }) {
-  const [active, setActive] = useState(initial);
+export function PeriodSwitcher() {
+  const { period: active, setPeriod } = usePeriodContext();
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    document.documentElement.dataset.period = active;
-  }, [active]);
 
   function select(period: Period) {
     if (period === active) return;
-    setActive(period);
+    setPeriod(period);
 
     startTransition(() => {
       fetch("/api/period", {

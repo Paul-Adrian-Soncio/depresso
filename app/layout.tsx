@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Newsreader, DM_Mono } from "next/font/google";
 import { getPeriod } from "@/lib/period";
+import { PeriodProvider } from "@/components/period-provider";
 import { PeriodSync } from "@/components/period-sync";
 import "./globals.css";
 
@@ -35,11 +36,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${bricolage.variable} ${newsreader.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <a href="#main-content" className="skip-link">
-          Skip to content
-        </a>
-        <PeriodSync hasCookie={hasCookie} />
-        {children}
+        <PeriodProvider initial={period}>
+          <a href="#main-content" className="skip-link">
+            Skip to content
+          </a>
+          <PeriodSync hasCookie={hasCookie} />
+          {children}
+        </PeriodProvider>
       </body>
     </html>
   );

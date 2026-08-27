@@ -82,6 +82,26 @@ A simulated gateway is better here, not just easier: it lets us deliberately
 trigger declines, timeouts and retries, so the project demonstrates error
 handling rather than only the happy path.
 
+### 2026-08-27 — Tier 01: time-of-day ambience + ambient sound mixer
+Chosen over the persistent lofi player, animated café interior, mood-based
+ordering, menu voice, and scroll-driven pour-over.
+
+**Why:** ambience extends plumbing Tier 00 already built (`data-period`, the
+switcher, the cross-fade) into hero art, copy and audio rather than starting
+from zero — backlog calls it the single strongest differentiator. The mixer is
+`M`-sized and, per the note below this used to be filed under, shares Web Audio
+plumbing with the persistent player — building it first proves out the
+gain-node/loop infrastructure before attempting the player's harder
+state-persistence-plus-visualizer problem, if that becomes a third pick later.
+
+**Deferred, not rejected:** persistent player (hardest frontend problem here,
+better attempted with the mixer's audio plumbing already proven), animated
+café interior (`L`, highest effort, better once there's momentum from two
+finished things), mood-based ordering (`FS` — drags in backend/Tier 02 work
+before Tier 01 is even settled), menu voice and scroll pour-over (smaller,
+lower-ceiling, backlog already flags pour-over as the first cut if the list
+runs long).
+
 ### 2026-08-27 — First contrast pass: two fixes to the Night Window tokens
 Checked WCAG contrast for every ink/accent pair against `--ground` and
 `--surface` in all four periods. Two pairs failed:
@@ -104,6 +124,15 @@ code and that table as the same source now, not `--ink-3`'s original values.
 This was expected; see "Known traps" in `CLAUDE.md`, which called out
 `--accent-text` as one instance of exactly this class of bug and predicted
 more. Re-run the contrast check after any future token change, not just once.
+
+### 2026-08-27 — Hero copy drops hardcoded rain and "corner table"
+Drafted afternoon and late hero lines in `lib/domain/copy.ts` to match the
+morning/dusk lines already in `docs/reference/homepage-*.html`, then on review
+edited morning and dusk too: dropped "the rain stopped an hour ago" / "sit
+with the rain for a while" (don't want weather asserted as fact in copy that
+has no actual weather data behind it) and "take the corner table" (too
+specific — not every layout will have one). The mockups still say the old
+wording; treat `lib/domain/copy.ts` as the current source, not the HTML.
 
 ---
 
@@ -129,12 +158,6 @@ Existential Espresso, Monday Mocha, Cold Brew Contemplation, Oat Flat White. The
 full menu of nine, the mood tags, and the site's wider voice are unwritten. Copy
 is the cheapest differentiator available here, so it deserves a real pass rather
 than being filled in while building components.
-
-### Which two signature interactions?
-**Trigger: before starting Tier 01.**
-
-All of Tier 01 depends on this. The persistent player and the ambient mixer
-share plumbing, so choosing both is cheaper than it looks.
 
 ### Hero art direction
 **Trigger: when building the hero. Recorded as options, nothing locked.**
