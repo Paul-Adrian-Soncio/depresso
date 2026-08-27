@@ -134,6 +134,31 @@ has no actual weather data behind it) and "take the corner table" (too
 specific — not every layout will have one). The mockups still say the old
 wording; treat `lib/domain/copy.ts` as the current source, not the HTML.
 
+### 2026-08-27 — Hero art: authored in code (option 1)
+Layered SVG built directly as a component, flat geometric shapes, fills wired
+to the time-of-day tokens — same approach the mascot ended up using. Chosen
+over hand-drawing in a vector editor and generate-then-trace.
+
+**Why:** re-lights across all four periods for free, no external tooling or
+licensing, and the mockups' window/lamp scene is already built this way as a
+usable starting point (`docs/reference/homepage-dusk.html` /
+`homepage-morning.html`). Building the mascot just proved out the whole
+workflow — hand-plan proportions, verify with an overlay/screenshot loop
+against a reference, keep it stroke- or fill-based with `--ink`/`--accent`
+rather than hardcoded hex — so there's no new technique to learn here, just
+applying it to the hero.
+
+**One divergence from the mockups:** the mockups hand-pick a fully custom hex
+palette per period for this scene (window colors, lamp glow, cup) — not the
+documented token set, and not values that appear anywhere else in the design
+system. The rebuilt hero uses only the existing tokens
+(`--ground`/`--surface`/`--surface-2`/`--ink`/`--ink-2`/`--ink-3`/`--accent`/
+`--cool`/`--line`/`--line-strong`/`--ok`), same as every other component, so
+there's one palette to maintain instead of a second bespoke one just for the
+hero. The lamp still visibly dims/warms across periods — via opacity and
+`--accent` already varying per period — just without inventing new colors to
+do it.
+
 ---
 
 ## Open
@@ -158,35 +183,6 @@ Existential Espresso, Monday Mocha, Cold Brew Contemplation, Oat Flat White. The
 full menu of nine, the mood tags, and the site's wider voice are unwritten. Copy
 is the cheapest differentiator available here, so it deserves a real pass rather
 than being filled in while building components.
-
-### Hero art direction
-**Trigger: when building the hero. Recorded as options, nothing locked.**
-
-The constraint that governs all three paths: whatever gets made has to be
-**re-lit four times**, so the output must be vector with token-driven fills. A
-flat raster image cannot do this — which is why path 3 below ends in a trace
-rather than an image.
-
-**1. Authored in code.** Layered SVG plus CSS and canvas, written directly as a
-component — flat geometric shapes, fills wired to the time-of-day tokens. Themes
-across all four periods for free, no external tooling, nothing to license. The
-scene in the identity canvas is already this.
-
-**2. Hand-drawn in a vector editor.** Inkscape (free), or Boxy SVG / Penpot /
-Figma's free tier. Export, run through SVGO to strip editor metadata, hand-edit
-fills to token variables. Same end result with more authorship; two to four
-evenings, and the style has to stay flat and geometric or it reads amateur.
-
-**3. Generated, then traced.** Generate a reference image with a free tool, trace
-to vector (Inkscape's Trace Bitmap or `vtracer`), clean up the paths, wire the
-fills. Fast to a first look, slow to something usable — auto-traces produce
-hundreds of junk paths, and cleanup often takes as long as drawing would have.
-Two risks: some reviewers react badly to AI art in a portfolio, and generated
-hero art is currently a marker of low-effort ones. If used, say so in the
-README's limitations section rather than leaving reviewers to wonder.
-
-A hybrid of 2 and 3 — generate only for thumbnails and composition, then draw it
-yourself — sidesteps the blank page while keeping authorship.
 
 ### Where does the audio come from?
 **Trigger: start during Phase 01, in the background.**

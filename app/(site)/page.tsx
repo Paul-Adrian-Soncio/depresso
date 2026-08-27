@@ -1,5 +1,6 @@
 import { PeriodSwitcher } from "@/components/period-switcher";
 import { HeroCopy } from "@/components/hero-copy";
+import { HeroScene } from "@/components/hero-scene";
 import { AmbientMixer } from "@/components/ambient-mixer";
 import { Mascot } from "@/components/mascot";
 
@@ -17,9 +18,12 @@ export default function Home() {
       </header>
       <main
         id="main-content"
-        className="flex flex-1 flex-col items-center justify-center gap-4 px-8 py-32 text-center"
+        className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center gap-16 px-8 py-16 lg:flex-row lg:items-center lg:py-24"
       >
-        <HeroCopy />
+        <div className="flex w-full max-w-lg flex-none flex-col items-center gap-4 text-center lg:items-start lg:text-left">
+          <HeroCopy />
+        </div>
+        <HeroScene className="w-full max-w-2xl flex-1 rounded-md border border-line" />
       </main>
       <section className="flex flex-col gap-6 px-8 pb-24">
         <div className="flex flex-col gap-2">
