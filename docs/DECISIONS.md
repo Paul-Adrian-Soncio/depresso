@@ -65,6 +65,19 @@ hour now. If inventory gets built later, it saves a migration that would
 otherwise touch orders, menu and analytics at once. Cheap insurance on a fork
 that is still open.
 
+### 2026-08-28 — Operations layer: in
+POS, inventory, and a live order queue are in scope, not deferred. Decided at
+the trigger point named when this was first opened: Tier 00 complete, one
+signature interaction (ambience + mixer) actually working, so the working
+pace is no longer a guess.
+
+**Consequence for schema work starting now:** `ingredients` gets a real stock
+quantity column and the stock-deduction Postgres function (`SELECT ... FOR
+UPDATE`, the race-condition guard CLAUDE.md calls out as the strongest single
+backend talking point) is built as part of the initial migration, not bolted
+on later. `recipes` already existed as a decision — this is what it was
+insurance for.
+
 ### 2026-08-26 — No timeline
 Worked on at Paul's own pace, in his own time. Dropped the four-week schedule
 entirely; `docs/BACKLOG.md` now carries a dependency-ordered build order instead,
@@ -162,18 +175,6 @@ do it.
 ---
 
 ## Open
-
-### Operations layer — in or out?
-**Trigger: Tier 00 complete and one signature interaction actually working.**
-
-POS, inventory, and a live order queue. Deliberately deferred until the
-groundwork is real and the actual working pace is known — that pace is the only
-input that matters, and it can't be guessed in advance. Tier 00 is identical
-either way, so nothing is blocked meanwhile.
-
-It roughly doubles the backend, so the honest tradeoff is fewer frontend
-features or a considerably longer project. Supabase Realtime has made it cheaper
-than first estimated, so revisit the numbers rather than the original gut call.
 
 ### Menu copy and brand voice
 **Trigger: before the menu gets built.**
