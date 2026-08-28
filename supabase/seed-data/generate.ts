@@ -21,6 +21,19 @@ const THREE_MONTHS_IN_DAYS = 90;
 const CAFE_OPEN_HOUR = 6;
 const CAFE_CLOSE_HOUR = 22;
 
+// The cafe is in Iloilo City, Philippines — UTC+8, no daylight saving.
+// Building Date objects via setHours() uses the *host machine's* local
+// timezone, not the cafe's, so "6am cafe time" would land at whatever UTC
+// hour the machine running this script happens to produce — wrong on any
+// machine not itself set to UTC+8. toCafeTimeUtc() sidesteps that by doing
+// the offset arithmetic directly instead of going through local-timezone
+// Date methods at all.
+const CAFE_UTC_OFFSET_HOURS = 8;
+
+function toCafeTimeUtc(year: number, month: number, day: number, hour: number, minute: number): Date {
+  return new Date(Date.UTC(year, month, day, hour - CAFE_UTC_OFFSET_HOURS, minute));
+}
+
 // Deterministic-enough PRNG (mulberry32) so the generated file is
 // reproducible between runs given the same seed — easier to review a diff
 // when re-running doesn't reshuffle everything.
@@ -106,10 +119,10 @@ const orderRows: string[] = [];
 const orderItemRows: string[] = [];
 
 const now = new Date();
-now.setSeconds(0, 0);
+now.setUTCSeconds(0, 0);
 
 const startDate = new Date(now);
-startDate.setDate(startDate.getDate() - THREE_MONTHS_IN_DAYS);
+startDate.setUTCDate(startDate.getUTCDate() - THREE_MONTHS_IN_DAYS);
 
 const menuEntries = SEED_MENU.map((item) => ({
   id: menuItemIds.get(item.name)!,
@@ -141,8 +154,16 @@ function addOrder(orderedAt: Date, status: string) {
 }
 
 for (let dayOffset = 0; dayOffset <= THREE_MONTHS_IN_DAYS; dayOffset++) {
-  const day = new Date(startDate);
-  day.setDate(day.getDate() + dayOffset);
+  // Walk the calendar date in UTC terms (dayOffset days after startDate's
+  // UTC date), then treat that Y/M/D as the cafe's *local* calendar date
+  // when building each order's timestamp — avoids local-timezone Date
+  // methods (setDate/setHours) entirely, so this produces the same output
+  // on any machine regardless of what timezone it's running in.
+  const dayUtc = new Date(startDate);
+  dayUtc.setUTCDate(dayUtc.getUTCDate() + dayOffset);
+  const year = dayUtc.getUTCFullYear();
+  const month = dayUtc.getUTCMonth();
+  const dayOfMonth = dayUtc.getUTCDate();
 
   // Busy-day roll is independent of weekday/weekend — roughly a third of
   // any given day, weekday or weekend, turns out to be a busy one.
@@ -152,8 +173,7 @@ for (let dayOffset = 0; dayOffset <= THREE_MONTHS_IN_DAYS; dayOffset++) {
   for (let i = 0; i < orderCount; i++) {
     const hour = randInt(CAFE_OPEN_HOUR, CAFE_CLOSE_HOUR - 1);
     const minute = randInt(0, 59);
-    const orderedAt = new Date(day);
-    orderedAt.setHours(hour, minute, 0, 0);
+    const orderedAt = toCafeTimeUtc(year, month, dayOfMonth, hour, minute);
 
     // Skip anything that would land in the future relative to "now".
     if (orderedAt > now) continue;

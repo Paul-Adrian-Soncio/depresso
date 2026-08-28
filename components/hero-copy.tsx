@@ -10,7 +10,7 @@ export function HeroCopy() {
   return (
     <>
       <p className="font-mono text-xs uppercase tracking-[0.16em] text-accent-text">
-        {copy.eyebrow} · Perth
+        {copy.eyebrow} · Iloilo City
       </p>
       <h1 className="max-w-2xl text-5xl font-bold tracking-[-0.04em] text-ink">
         {copy.headline}

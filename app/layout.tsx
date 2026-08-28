@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Newsreader, DM_Mono } from "next/font/google";
-import { getPeriod } from "@/lib/period";
-import { PeriodProvider } from "@/components/period-provider";
-import { PeriodSync } from "@/components/period-sync";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -26,24 +23,22 @@ export const metadata: Metadata = {
   description: "A lofi coffee shop that only exists on the internet.",
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const { period, hasCookie } = await getPeriod();
-
+/**
+ * Genuinely global only: fonts, the required <html>/<body> tags, a fixed
+ * default data-period. The LIVE period (PeriodProvider, PeriodSync, the
+ * visitor-clock-driven data-period value) lives in app/(site)/layout.tsx
+ * instead — this root layout is mandatory and wraps every route including
+ * /admin, so anything that changes with the time of day has to stay out of
+ * it or it bleeds into the admin section, which needs a fixed palette.
+ */
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      data-period={period}
+      data-period="dusk"
       className={`${bricolage.variable} ${newsreader.variable} ${dmMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <PeriodProvider initial={period}>
-          <a href="#main-content" className="skip-link">
-            Skip to content
-          </a>
-          <PeriodSync hasCookie={hasCookie} />
-          {children}
-        </PeriodProvider>
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

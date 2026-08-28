@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   graphql_public: {
     Tables: {
@@ -212,9 +212,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      busiest_hours: {
+        Args: never
+        Returns: {
+          hour_of_day: number
+          order_count: number
+        }[]
+      }
       deduct_stock_for_order: {
         Args: { p_order_id: string }
         Returns: undefined
+      }
+      most_ordered_drinks: {
+        Args: { p_limit?: number }
+        Returns: {
+          menu_item_id: string
+          menu_item_name: string
+          total_quantity: number
+        }[]
+      }
+      weekly_volume: {
+        Args: never
+        Returns: {
+          order_count: number
+          revenue_cents: number
+          week_start: string
+        }[]
       }
     }
     Enums: {

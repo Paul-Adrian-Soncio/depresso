@@ -211,6 +211,28 @@ hero. The lamp still visibly dims/warms across periods — via opacity and
 `--accent` already varying per period — just without inventing new colors to
 do it.
 
+### 2026-08-29 — The cafe is in Iloilo City, not Perth
+The hero copy and both reference mockups said "Perth" — a placeholder from
+whoever built the original mockups, never an actual decision, and nothing
+in `docs/DECISIONS.md` ever settled it. Caught while building analytics: the
+seed script's "cafe hours" only make sense relative to a real timezone, and
+Perth surfaced as the assumed one with no record of why. Changed to Iloilo
+City, Philippines (UTC+8 — same numeric offset as Perth, so this isn't a
+timezone change, just a correct city). Updated `components/hero-copy.tsx`
+and both `docs/reference/homepage-*.html` mockups to match.
+
+**Consequence:** found and fixed a real bug alongside this. The seed
+generator built order timestamps using `Date`'s local-timezone methods
+(`setHours`, `setDate`) and then serialized to UTC — so "6am–10pm cafe
+hours" landed at whatever UTC hours the *host machine's* timezone happened
+to produce, not the cafe's. `busiest_hours()` (new analytics function) is
+what surfaced it: it showed real order volume at UTC hours that should have
+been empty. Fixed in `supabase/seed-data/generate.ts` by doing the cafe's
+UTC+8 offset arithmetic explicitly (`toCafeTimeUtc`) instead of going
+through any local-timezone `Date` method — the generator now produces the
+same output regardless of what timezone the machine running it is set to.
+Regenerated `seed.sql` and re-ran `supabase db reset --linked`.
+
 ---
 
 ## Open
