@@ -166,7 +166,7 @@ something to redraw from scratch.
 Because nobody will ever place a real order, the site has to work harder to feel
 inhabited. These govern every feature.
 
-1. **No empty states on arrival.** Six months of seeded orders, a stocked menu,
+1. **No empty states on arrival.** Three months of seeded orders, a stocked menu,
    a filled corkboard, a loyalty card partway through. An empty admin table
    reads as unfinished, not as "no data yet."
 2. **Compress time.** A real order takes eight minutes; this one advances

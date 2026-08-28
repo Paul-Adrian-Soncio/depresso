@@ -78,6 +78,45 @@ backend talking point) is built as part of the initial migration, not bolted
 on later. `recipes` already existed as a decision — this is what it was
 insurance for.
 
+### 2026-08-28 — Menu copy: full nine, voice settled
+Full menu drafted in `supabase/seed-data/menu.ts`, ready for the seed script.
+Four names/descriptions already existed in the mockups (Existential Espresso,
+Monday Mocha, Cold Brew Contemplation, Oat Flat White) and stayed as-is; five
+are new: 25th Hour, Chamomile for Later, Steamed Oat Milk, Triple Espresso,
+Cinnamon Cortado.
+
+**Voice, extracted from the four existing lines and matched going forward:**
+one-word-to-few-word mood tag, drink name, one dry declarative sentence
+(never more than ~12 words), no exclamation points, self-aware rather than
+actually bleak.
+
+**25th Hour was Paul's idea, not drafted** — a shot of espresso with a white
+energy drink standing in for the milk. It's the drink the site's name was
+originally going to riff on before "Depresso" was chosen, so it earns a
+place on the menu as the outlier joke: priciest item ($6.50), mood tag
+"Unwise", copy "Unlock the hidden 25th hour of the day with this unhinged
+cup of coffee. Drink with absolute care."
+
+**Deliberately mixed the category**, not all-coffee: added a tea (Chamomile
+for Later) and a non-caffeinated steamer (Steamed Oat Milk) alongside five
+coffee variations, for a menu that reads like a real shop's spread rather
+than nine espresso permutations.
+
+**Consequence:** two ingredients not in the original inventory sketch are
+now needed — white energy drink (25th Hour) and chamomile tea bags
+(Chamomile for Later) — both added to the ingredient list this seed data
+assumes.
+
+### 2026-08-28 — Seed data window: three months, not six
+CLAUDE.md and the backlog both said "six months of seeded orders." That
+number was never derived from anything else in the docs — it was an example
+figure attached to the real requirement, which is rule 1 ("no empty states
+on arrival"), not a specific duration. Three months still gives a believable
+weekday/weekend curve and enough history for the analytics feature to show
+real patterns, with meaningfully fewer rows to generate and store. Updated
+both `CLAUDE.md` and `docs/BACKLOG.md` to say three months rather than
+leaving the old figure stale next to a script that does something else.
+
 ### 2026-08-26 — No timeline
 Worked on at Paul's own pace, in his own time. Dropped the four-week schedule
 entirely; `docs/BACKLOG.md` now carries a dependency-ordered build order instead,
@@ -175,15 +214,6 @@ do it.
 ---
 
 ## Open
-
-### Menu copy and brand voice
-**Trigger: before the menu gets built.**
-
-Drink names and descriptions are drafted only as far as the mockups needed —
-Existential Espresso, Monday Mocha, Cold Brew Contemplation, Oat Flat White. The
-full menu of nine, the mood tags, and the site's wider voice are unwritten. Copy
-is the cheapest differentiator available here, so it deserves a real pass rather
-than being filled in while building components.
 
 ### Where does the audio come from?
 **Trigger: start during Phase 01, in the background.**

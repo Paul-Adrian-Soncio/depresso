@@ -48,7 +48,7 @@ item here is chosen because a reviewer can watch the loop close in ten seconds.
 
 | Feature | Tags | Notes |
 |---|---|---|
-| The seed script | `BE` `M` | Six months of orders with plausible names, realistic timestamps, believable weekday/weekend curve. Lives in `supabase/seed.sql` so `db reset` restores it. **Build early — it's what makes every other backend feature look real**, and almost everyone skips it. |
+| The seed script | `BE` `M` | Three months of orders with plausible names, realistic timestamps, believable weekday/weekend curve. Lives in `supabase/seed.sql` so `db reset` restores it. **Build early — it's what makes every other backend feature look real**, and almost everyone skips it. |
 | Admin dashboard | `FS` `L` | CRUD the menu, toggle sold out, watch orders arrive. Admin in one tab, public site in another, flip a drink, watch it grey out. **The clearest possible proof you built both halves**, no code reading required. |
 | Order-ahead flow | `FS` `L` | Cart → simulated checkout → status timeline that auto-advances. Skipping real payments is an *advantage*: a fake gateway lets you trigger declines, timeouts and retries, so you demonstrate error handling. |
 | Loyalty stamp card | `FS` `M` | Auth, persistence and a small rule engine in a very small surface area — a good first backend feature. Seed the demo account at 7 of 10 stamps so the reward is three clicks away. |
