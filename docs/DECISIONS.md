@@ -318,6 +318,23 @@ typing the URL. Still has an in-page confirm step (not a native `confirm()`,
 which doesn't fit the design system) since it's destructive even if only the
 owner can reach it.
 
+### 2026-08-31 — Orders page splits into a queue half and a pickup-board half
+`/admin/orders` was a single list with per-order controls (Cancel, advance).
+Added a second, controls-free panel (`PickupBoard`) next to it — the
+"screen above the counter" idea from the proposed operations layer, scoped
+down to fit inside the existing admin page rather than becoming its own
+route. Groups active orders into two columns: "In progress" (received +
+brewing collapsed together — a waiting customer doesn't distinguish the
+sub-stage) and "Ready for pickup." Carries the mascot + wordmark in its own
+header so it reads as a distinct display surface, not another admin table.
+
+**No separate "erase" logic needed:** both halves render the same `orders`
+array `SimulationController` already owns as the single source of truth.
+Clicking "Complete" on the queue side calls the existing `advanceOrder`
+action, which moves the order out of the active statuses `getActiveOrders()`
+returns — the next refresh drops it from both panels simultaneously, for
+free, since there was never a second copy of the list to keep in sync.
+
 ---
 
 ## Open

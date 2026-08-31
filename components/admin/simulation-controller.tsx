@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Play, Square } from "lucide-react";
 import { OrderQueue } from "@/components/admin/order-queue";
+import { PickupBoard } from "@/components/admin/pickup-board";
 import { ActivityFeed, type FeedEntry } from "@/components/admin/activity-feed";
 import type { QueueOrder } from "@/lib/db/orders";
 import type { SimulationEvent } from "@/app/api/simulation/tick/route";
@@ -119,7 +120,10 @@ export function SimulationController({ initialOrders }: { initialOrders: QueueOr
           {running ? "Stop" : "Start"}
         </button>
       </div>
-      <OrderQueue orders={orders} onChanged={refreshOrders} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
+        <OrderQueue orders={orders} onChanged={refreshOrders} />
+        <PickupBoard orders={orders} />
+      </div>
       <ActivityFeed entries={feed} />
     </div>
   );
