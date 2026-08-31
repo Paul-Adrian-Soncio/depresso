@@ -233,6 +233,91 @@ through any local-timezone `Date` method — the generator now produces the
 same output regardless of what timezone the machine running it is set to.
 Regenerated `seed.sql` and re-ran `supabase db reset --linked`.
 
+### 2026-08-31 — Back-navigation could silently overwrite the active period
+Browser back-navigation from `/admin/login` to the homepage was restoring
+"morning" instead of the visitor's actual last-picked period, only
+self-correcting on a manual refresh. Root cause: Next's client-side router
+cache can restore a page from an RSC payload rendered before a cookie
+existed, so `PeriodSync`'s `hasCookie` prop and `PeriodProvider`'s `initial`
+prop can both be stale on that render — `PeriodSync` then re-ran
+auto-detection and overwrote the real cookie, and `<html data-period>`
+stayed wherever `/admin`'s `ForceDusk` had left it since the DOM-write
+effect only re-ran when React state changed, which it hadn't.
+
+**Fix:** both components now resolve the *actual* cookie value themselves
+(`document.cookie`) on mount rather than trusting the prop, so a stale
+router-cache render can no longer clobber a real cookie or leave a stale
+`data-period` behind. Verified via Playwright: manual period pick → visit
+`/admin/login` → browser back (and the login page's own back link) both
+restore the exact prior period immediately, no refresh needed.
+
+### 2026-08-31 — Simulation mode: order creation, closing the inventory loop
+The inventory/recipe backend (schema, derived sold-out state in `getMenu()`,
+the race-safe `deduct_stock_for_order` function) already existed from the
+initial schema, but nothing ever called it — orders are always created
+already at `"received"`, and there was no order-creation path at all, so the
+function was dead code. Rather than building the full order-ahead flow
+(cart, checkout, fake payment) to close that gap, built simulation mode
+instead: a toggle on `/admin/orders` that places and advances fake orders
+every few seconds against whatever's actually orderable, calling
+`deduct_stock_for_order` for real. Smaller than order-ahead (`S` vs `L` in
+the backlog) and it's the piece actually missing — a customer-facing
+ordering UI is separate scope.
+
+**Design:** `lib/domain/simulation.ts` picks a random available menu item
+respecting the same `isSoldOut`/`outOfStock` rule the public menu uses, so
+simulation can never "order" something a real visitor couldn't. `lib/db/orders.ts`
+gained `placeOrder()` (insert + RPC, rolls back to `cancelled` if stock ran
+out) and `advanceRandomActiveOrder()`. A client-side interval
+(`SimulationController`) drives `/api/simulation/tick`, weighted 40% toward
+placing a new order and 60% toward advancing an existing one so the queue
+doesn't grow unbounded over a long demo session. Runs only while the tab
+with the toggle is open — no background job or cron, consistent with this
+being a demo control rather than production infrastructure.
+
+**Visual feedback, deliberately both:** the existing `OrderQueue` table
+animates in new rows (CSS-only — a freshly mounted DOM node plays
+`animate-row-in`; existing rows are untouched since React reconciles by
+`key`), and a new `ActivityFeed` corner ticker logs each tick's event in
+plain language. Considered picking one; both were cheap once polling
+existed and prove the same real data two ways — the table for "is this
+real," the feed for "what just happened" without reading a table.
+
+**Auth:** `/api/simulation/tick` mutates real orders and stock, so it needed
+the same session gate as the rest of `/admin` — extended the proxy matcher
+to include `/api/simulation/:path*`, and added an API-aware branch (401 JSON
+instead of a login-page redirect) since the existing redirect behavior is
+wrong for a `fetch()` caller.
+
+### 2026-08-31 — Reset demo data: hidden page, not a shared-nav button
+Backlog's "Demo reset" item (`FS` `S`) assumed something like
+`supabase db reset`, which needs the CLI/Docker and can't run from a
+deployed server action. Built `resetDemoData()` instead: truncates
+`orders`/`order_items`/`recipe_items`/`menu_items`/`ingredients` and
+re-inserts from the same typed seed data (`supabase/seed-data/*.ts`),
+including a freshly generated ~90 days of order history — extracted the
+order-generation algorithm out of `supabase/seed-data/generate.ts` into
+`lib/domain/seed-generation.ts` so the build-time script and the runtime
+reset action share one implementation instead of two copies drifting apart.
+Runtime reset seeds the generator from `Date.now()` (a different plausible
+history each time) where the build-time script keeps a fixed seed
+(reproducible diffs when regenerating `seed.sql`). Batches inserts (500 rows
+per call) rather than one row per request — naive one-by-one would be
+thousands of round trips for ~1500 orders.
+
+**Why hidden, not next to the simulation toggle as first proposed:** there
+is one shared database behind the whole demo (no multi-tenancy, per
+CLAUDE.md's non-goals) — Reset wipes and regenerates orders/stock for
+*everyone* currently on the site, not a per-visitor copy. That's an accepted
+tradeoff for existing admin actions too (toggling sold-out, adjusting
+stock), but Reset is the most visible/destructive version of it. Rather than
+solve that with a warning label next to a button any reviewer with the demo
+password could press, moved it to `/admin/reset` — same session gate as the
+rest of `/admin`, but not linked from `AdminNav`, so it's reachable only by
+typing the URL. Still has an in-page confirm step (not a native `confirm()`,
+which doesn't fit the design system) since it's destructive even if only the
+owner can reach it.
+
 ---
 
 ## Open

@@ -12,12 +12,21 @@ import { usePeriodContext } from "@/components/period-provider";
  * overwrites a cookie that already exists — that would clobber a manual
  * override from the header switcher or an auto-detection from earlier in
  * the session.
+ *
+ * Deliberately re-checks `document.cookie` itself on every mount rather than
+ * trusting the `hasCookie` prop alone: browser back/forward navigation can
+ * remount this component from a cached RSC payload rendered before the
+ * cookie existed, where `hasCookie` is still `false` even though a real
+ * cookie is now set. Trusting only the prop in that case re-runs
+ * auto-detection and silently overwrites a manual period pick with
+ * whatever the real-world time resolves to.
  */
 export function PeriodSync({ hasCookie }: { hasCookie: boolean }) {
   const { setPeriod } = usePeriodContext();
 
   useEffect(() => {
     if (hasCookie) return;
+    if (document.cookie.includes("depresso-period=")) return;
 
     const period = periodFromDate(new Date());
     setPeriod(period);

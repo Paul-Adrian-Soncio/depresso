@@ -1,5 +1,5 @@
 import { getActiveOrders } from "@/lib/db/orders";
-import { OrderQueue } from "@/components/admin/order-queue";
+import { SimulationController } from "@/components/admin/simulation-controller";
 
 export default async function AdminOrdersPage() {
   const orders = await getActiveOrders();
@@ -13,7 +13,7 @@ export default async function AdminOrdersPage() {
           orders live in analytics, not here.
         </p>
       </div>
-      <OrderQueue orders={orders} />
+      <SimulationController initialOrders={orders} />
     </div>
   );
 }

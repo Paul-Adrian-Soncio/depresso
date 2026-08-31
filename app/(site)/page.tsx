@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { KeyRound } from "lucide-react";
 import { PeriodSwitcher } from "@/components/period-switcher";
 import { HeroCopy } from "@/components/hero-copy";
 import { HeroScene } from "@/components/hero-scene";
@@ -15,7 +17,18 @@ export default function Home() {
             Depresso
           </span>
         </span>
-        <PeriodSwitcher />
+        <div className="flex items-center gap-3">
+          <PeriodSwitcher />
+          <Link
+            href="/admin"
+            aria-label="Admin"
+            title="Admin"
+            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+          >
+            <KeyRound size={13} />
+            Admin
+          </Link>
+        </div>
       </header>
       <main
         id="main-content"

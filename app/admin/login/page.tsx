@@ -1,5 +1,8 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { login } from "@/app/admin/login/actions";
 import { Mascot } from "@/components/mascot";
+import { ForceDusk } from "@/components/admin/force-dusk";
 
 export default async function AdminLoginPage({
   searchParams,
@@ -10,7 +13,15 @@ export default async function AdminLoginPage({
   const demoPassword = process.env.ADMIN_DEMO_PASSWORD ?? "";
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-8" data-period="dusk">
+    <main className="relative flex min-h-screen flex-col items-center justify-center gap-8 px-8" data-period="dusk">
+      <ForceDusk />
+      <Link
+        href="/"
+        className="absolute left-8 top-8 flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+      >
+        <ArrowLeft size={13} />
+        Back to the site
+      </Link>
       <div className="flex flex-col items-center gap-2 text-center">
         <Mascot className="h-20 w-auto" />
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-accent-text">

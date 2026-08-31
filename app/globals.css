@@ -82,6 +82,8 @@
   --font-display: var(--font-bricolage), 'Trebuchet MS', sans-serif;
   --font-body: var(--font-newsreader), Georgia, 'Times New Roman', serif;
   --font-mono: var(--font-dm-mono), ui-monospace, Menlo, monospace;
+  --animate-feed-in: feed-in var(--duration-slow) var(--ease-quiet);
+  --animate-row-in: row-in var(--duration-slow) var(--ease-quiet);
 
   /* Radii — small and tight, never the default rounded-xl jump. */
   --radius-sm: 3px;
@@ -96,6 +98,20 @@
   --duration-base: 200ms;
   --duration-slow: 320ms;
   --duration-period: 700ms;
+}
+
+@keyframes feed-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
 
 body {

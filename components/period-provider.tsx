@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import type { Period } from "@/lib/domain/period";
+import { isPeriod, type Period } from "@/lib/domain/period";
 
 interface PeriodContextValue {
   period: Period;
@@ -30,6 +30,25 @@ export function PeriodProvider({
     setPeriodState(next);
     document.documentElement.dataset.period = next;
   }
+
+  useEffect(() => {
+    // Re-read the cookie directly rather than trusting `period` state or the
+    // `initial` prop: Next's router cache can serve a stale RSC payload for
+    // this route on browser back-navigation (no server round-trip at all),
+    // reusing this component with whatever `initial` value that stale
+    // payload was rendered with. Meanwhile /admin's ForceDusk has already
+    // overwritten <html data-period> directly. Resolving the cookie
+    // ourselves on every mount is the only value guaranteed to be current.
+    const match = document.cookie.match(/(?:^|; )depresso-period=([^;]+)/);
+    const cookiePeriod = match?.[1];
+    const current = isPeriod(cookiePeriod) ? cookiePeriod : initial;
+    document.documentElement.dataset.period = current;
+    // Correcting possibly-stale router-cache state to the real cookie value,
+    // same pattern as the ambient mixer's post-mount localStorage correction.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPeriodState(current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.period = period;

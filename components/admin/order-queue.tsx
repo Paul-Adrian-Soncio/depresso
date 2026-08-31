@@ -26,7 +26,13 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
-export function OrderQueue({ orders }: { orders: QueueOrder[] }) {
+export function OrderQueue({
+  orders,
+  onChanged,
+}: {
+  orders: QueueOrder[];
+  onChanged?: () => void;
+}) {
   const [isPending, startTransition] = useTransition();
 
   if (orders.length === 0) {
@@ -44,7 +50,7 @@ export function OrderQueue({ orders }: { orders: QueueOrder[] }) {
         return (
           <div
             key={order.id}
-            className="flex items-center justify-between gap-4 rounded-md border border-line bg-surface p-4"
+            className="animate-row-in flex items-center justify-between gap-4 rounded-md border border-line bg-surface p-4"
           >
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-3">
@@ -66,8 +72,9 @@ export function OrderQueue({ orders }: { orders: QueueOrder[] }) {
                 type="button"
                 disabled={isPending}
                 onClick={() =>
-                  startTransition(() => {
-                    cancelOrder(order.id);
+                  startTransition(async () => {
+                    await cancelOrder(order.id);
+                    onChanged?.();
                   })
                 }
                 className="rounded-sm border border-line-strong px-3 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -79,8 +86,9 @@ export function OrderQueue({ orders }: { orders: QueueOrder[] }) {
                   type="button"
                   disabled={isPending}
                   onClick={() =>
-                    startTransition(() => {
-                      advanceOrder(order.id, order.status);
+                    startTransition(async () => {
+                      await advanceOrder(order.id, order.status);
+                      onChanged?.();
                     })
                   }
                   className="rounded-sm bg-accent px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-[0.1em] text-on-accent transition-colors duration-base hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"

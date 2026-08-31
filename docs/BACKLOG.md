@@ -48,13 +48,13 @@ item here is chosen because a reviewer can watch the loop close in ten seconds.
 
 | Feature | Tags | Notes |
 |---|---|---|
-| The seed script | `BE` `M` | Three months of orders with plausible names, realistic timestamps, believable weekday/weekend curve. Lives in `supabase/seed.sql` so `db reset` restores it. **Build early — it's what makes every other backend feature look real**, and almost everyone skips it. |
-| Admin dashboard | `FS` `L` | CRUD the menu, toggle sold out, watch orders arrive. Admin in one tab, public site in another, flip a drink, watch it grey out. **The clearest possible proof you built both halves**, no code reading required. |
-| Order-ahead flow | `FS` `L` | Cart → simulated checkout → status timeline that auto-advances. Skipping real payments is an *advantage*: a fake gateway lets you trigger declines, timeouts and retries, so you demonstrate error handling. |
+| The seed script | `BE` `M` | ✅ **Done.** Three months of orders with plausible names, realistic timestamps, believable weekday/weekend curve. Lives in `supabase/seed.sql` so `db reset` restores it — plus a runtime reset action (`/admin/reset`) sharing the same generator. |
+| Admin dashboard | `FS` `L` | ✅ **Done.** CRUD the menu, toggle sold out, watch orders arrive. Admin in one tab, public site in another, flip a drink, watch it grey out. |
+| Order-ahead flow | `FS` `L` | Cart → simulated checkout → status timeline that auto-advances. Skipping real payments is an *advantage*: a fake gateway lets you trigger declines, timeouts and retries, so you demonstrate error handling. **Not built** — simulation mode (below) closed the order-creation gap without needing the customer-facing cart/checkout UI this implies. |
 | Loyalty stamp card | `FS` `M` | Auth, persistence and a small rule engine in a very small surface area — a good first backend feature. Seed the demo account at 7 of 10 stamps so the reward is three clicks away. |
-| Track request queue | `FS` `L` | Visitors upvote what plays next, live. **Possibly superseded** — if the operations layer goes ahead, the order queue uses the same plumbing, is more relevant, and needs no music licensing. |
+| Track request queue | `FS` `L` | Visitors upvote what plays next, live. **Superseded** — the order queue (built) uses the same plumbing, is more relevant, and needed no music licensing. |
 | Corkboard guestbook | `FS` `M` | Notes pinned to a board. CRUD plus rate limiting plus a moderation queue in the admin. Small feature, but **"I thought about abuse" is a senior signal** that almost no junior portfolio shows. |
-| Shop analytics | `FS` `M` | Most-ordered drink, busiest hour, weekly volume — computed in SQL from the seeded orders. Pure payoff from the seed script, and it gives the admin dashboard something worth looking at. |
+| Shop analytics | `FS` `M` | ✅ **Done.** Most-ordered drink, busiest hour, weekly volume — computed in SQL from the seeded orders. |
 
 ---
 
@@ -69,10 +69,10 @@ roughly doubles the backend.
 
 | Feature | Tags | Notes |
 |---|---|---|
-| Inventory & recipes | `FS` `L` | **The strongest single addition available.** Drinks composed of ingredients, so an order deducts against a recipe and stock hitting zero auto-disables the item. The only feature producing real domain logic rather than CRUD: joins, transactions, and a genuine race condition on the last unit. Upgrades the admin sold-out toggle from a manual switch into derived state. |
-| Order queue display | `FS` `M` | The screen above the counter: waiting, in progress, ready. Essentially a read-only realtime view — **cheap on Supabase Realtime** — and the most visually satisfying surface in the system. |
+| Inventory & recipes | `FS` `L` | ✅ **Done.** Drinks composed of ingredients, so an order deducts against a recipe (via `deduct_stock_for_order`, `SELECT ... FOR UPDATE`) and stock hitting zero auto-disables the item. Admin sold-out toggle is a manual override on top of this derived state, not instead of it. |
+| Order queue display | `FS` `M` | The screen above the counter: waiting, in progress, ready. Essentially a read-only realtime view — **cheap on Supabase Realtime** — and the most visually satisfying surface in the system. The admin `/admin/orders` queue exists but is barista-facing (advance/cancel controls), not this read-only front-of-house display — still open. |
 | Staff POS | `FS` `L` | One screen: grid of drinks, tap to add, tap to charge, order drops into the queue. A second design language — dense, fast, large touch targets — deliberately opposite to the lofi site. **That contrast is the point:** few portfolios show design for someone using a tool eight hours a day. One screen ≈ four days; "a real POS" eats the month. |
-| Simulation mode | `FS` `S` | A toggle spawning fake customers ordering every few seconds, so the POS and queue are alive the moment a reviewer opens them. Rule 1 applied to the surfaces that need it most. |
+| Simulation mode | `FS` `S` | ✅ **Done**, on `/admin/orders`. A toggle spawning fake customers ordering every few seconds against real menu items — real stock deduction, real race-condition guard. Queue table animates in new/changed rows; a corner activity feed logs each event in plain language. Runs client-side while the tab is open, no background job. |
 
 **Why it might be worth the cost.** Four tabs open: customer site, POS, barista queue,
 admin dashboard. Ring up an oat flat white on the POS — the ticket appears on the
@@ -90,7 +90,7 @@ study loses to a plainer one that explains itself.
 |---|---|---|
 | Case study page | `M` | Problem, constraints, three decisions with tradeoffs, what you'd do differently. Hiring managers read this more carefully than the code — it's the only place they see how you think. |
 | Dev-mode overlay | `FE` `M` | A hidden toggle annotating the live UI with what's underneath: which component, which endpoint, which query. Nerdy, memorable, and it forces you to genuinely understand your own architecture. |
-| Demo reset | `FS` `S` | One button restores seed state. Also saves you in a live interview after someone has marked the whole menu sold out. |
+| Demo reset | `FS` `S` | ✅ **Done**, at `/admin/reset` — not linked from the admin nav (see `docs/DECISIONS.md`: it's a shared-database action, kept off the surface any reviewer with the demo password could reach). One button restores seed state, freshly regenerated rather than replaying the exact same rows every time. |
 | Performance & a11y report | `S` | Lighthouse numbers and an axe pass in the README with real figures, not a badge. And if the numbers are bad you learn it before an interviewer does. |
 | README that respects the reader | `S` | What it is, how to run it, architecture in one diagram, honest limitations section. The limitations section is what makes the rest believable. |
 
