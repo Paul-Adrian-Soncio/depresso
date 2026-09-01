@@ -499,6 +499,35 @@ on `accent` against the 3:1 large-text/bold floor CLAUDE.md's own
 to the other three periods. `CLAUDE.md`'s token table updated to match;
 treat the code as source, per its own instruction.
 
+### 2026-09-02 — First-visit auto-detect could get stomped back to dusk
+User report: opened the site in a fresh incognito window at 2am local time,
+landed on dusk instead of late; a manual refresh then correctly showed
+late. Root cause was a mount-order race between two sibling components,
+not the auto-detection logic itself (which was already correct).
+
+`PeriodSync` (child, so its effect runs first) detects the real period from
+the visitor's clock and calls `setPeriod` synchronously — but its cookie
+write is an async `fetch()` POST that hasn't resolved by the time the next
+effect runs. `PeriodProvider`'s own mount effect (added to fix the earlier
+back-navigation bug — see the 2026-08-31 entry) then re-read
+`document.cookie`, found nothing yet, and fell back to `initial` (the SSR
+default, always `"dusk"` when no cookie exists) — silently overwriting the
+just-corrected value before the visitor ever saw it settle.
+
+**Fix:** `PeriodProvider`'s correction effect now returns early when there's
+no cookie at all, instead of falling back to `initial` in that case. No
+cookie means there's nothing to "correct back to" — `PeriodSync` is the
+sole authority for that scenario. The effect still corrects from a real
+cookie on every mount (the back-navigation case it was built for), just no
+longer treats "no cookie yet" as equivalent to "cookie says dusk."
+
+Verified with Playwright: forced the browser clock to 2am with a fresh
+(cookie-less) context, sampled `data-period` across the first ~1.2s of a
+real page load — one unavoidable `dusk` frame during SSR-to-hydration,
+then settles to `late` and stays there, cookie correctly set. Re-verified
+the original back-navigation fix (manual override survives browser back)
+still holds after this change.
+
 ---
 
 ## Open

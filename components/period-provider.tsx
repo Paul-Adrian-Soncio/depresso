@@ -39,15 +39,26 @@ export function PeriodProvider({
     // payload was rendered with. Meanwhile /admin's ForceDusk has already
     // overwritten <html data-period> directly. Resolving the cookie
     // ourselves on every mount is the only value guaranteed to be current.
+    //
+    // But if there's no cookie at all, there's nothing to "correct back to"
+    // — and doing so is actively harmful on a true first visit. PeriodSync
+    // (a sibling, whose effect runs first since it's the child) detects the
+    // real period from the visitor's clock and calls setPeriod
+    // synchronously, but its cookie write is an async fetch() that hasn't
+    // resolved yet by the time this effect runs. Reading document.cookie
+    // here and falling back to `initial` (the SSR default, "dusk") would
+    // stomp PeriodSync's freshly-detected value right back to dusk before
+    // the visitor ever saw it corrected. No cookie means PeriodSync owns
+    // this decision — leave period/DOM exactly as they are.
     const match = document.cookie.match(/(?:^|; )depresso-period=([^;]+)/);
     const cookiePeriod = match?.[1];
-    const current = isPeriod(cookiePeriod) ? cookiePeriod : initial;
-    document.documentElement.dataset.period = current;
+    if (!isPeriod(cookiePeriod)) return;
+
+    document.documentElement.dataset.period = cookiePeriod;
     // Correcting possibly-stale router-cache state to the real cookie value,
     // same pattern as the ambient mixer's post-mount localStorage correction.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPeriodState(current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setPeriodState(cookiePeriod);
   }, []);
 
   useEffect(() => {
