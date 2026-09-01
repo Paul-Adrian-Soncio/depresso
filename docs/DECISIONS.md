@@ -448,26 +448,68 @@ than eyeballing it:
    of the spectrum that's actually alive for this style of music, rather
    than reserving visual space for a range that's reliably silent.
 
+### 2026-09-02 — Case study and credits combined into one page
+Built `/case-study` as a single page covering both the Tier 03 "case study"
+item and the "Built using" credits item — not two separate pages. Follows
+CLAUDE.md's own guidance for this page ("three decisions with tradeoffs",
+not a features list, since a features list just restates what a reviewer
+already sees by using the site) rather than defaulting to something
+simpler to write. Content pulled directly from real decisions already
+recorded here rather than invented: the stock-deduction race-condition
+guard, the time-of-day system, and a genuine debugging story (the
+visualizer's frequency-mapping fix — see the 2026-09-01 entry above).
+Linked from the homepage header next to Admin, satisfying the "two clicks
+to anything" demo rule.
+
+A "what I'd do differently" section (covering the Free To Use licensing
+ambiguity and two bugs caught by specifically checking for them) was
+drafted and then cut on review — decided the page reads better without it
+for now.
+
+**Consequence:** closes the "Built using" credits page open item — folded
+into this page's own "Built using" section rather than shipping separately,
+per the explicit request to combine them. `lib/domain/playlist.ts`'s own
+doc comment was also corrected here — it previously said the player tracks
+came from Pixabay, which was wrong; that's the ambient mixer's source, the
+player's tracks are from Free To Use.
+
 ---
 
 ## Open
 
-### "Built using" credits page
-**Trigger: before Tier 03 / launch — needed regardless of when the freeze lands.**
-
-Needs to list every dependency and asset source, including the Free To Use
-player track attribution (see the 2026-09-01 entry above) and the Pixabay
-ambient-mixer attribution. Deliberately not folded into the site footer, so
-credits live in one place.
-
 ### Which second backend loop?
-**Trigger: start of Phase 03.**
+**Resolved by what shipped, not by a fresh decision.** The admin dashboard
+(mandatory) plus inventory/recipes, simulation mode, and demo reset all
+landed — the "second loop" question is answered in practice, just never
+formally closed here. Leaving this entry as a pointer rather than deleting
+it, since it's the historical record of why those got picked.
 
-The admin dashboard is close to mandatory — it's the clearest proof. The second
-is a real choice, and partly depends on the operations-layer fork.
+### Pending work snapshot — 2026-09-02
+Recorded on request, session paused here. Not urgent, just a clean
+re-entry point.
+
+**Small, self-contained:**
+- Global spacebar play/pause shortcut for the persistent player — only the
+  focused scrubber's arrow-key seek exists today (`components/player-bars.tsx`).
+
+**Sizeable, unbuilt operations-layer pieces** (from the "Proposed" section
+above):
+- Order queue display — a read-only front-of-house screen, distinct from
+  `/admin/orders`'s barista-facing advance/cancel controls.
+- Staff POS — the last big piece, `L`-sized, a deliberately dense/fast
+  second design language.
+
+**Unpicked Tier 02 items** (optional — already well past "pick two or
+three" with what's built): loyalty stamp card, corkboard guestbook.
+
+**Tier 03, gated behind a feature freeze:** dev-mode overlay,
+performance & a11y report, README.
 
 ### When to freeze?
-**Trigger: not answerable yet — but hold onto it.**
+**Trigger: not answerable yet — but hold onto it.** Worth actively
+considering now, given how much of Tier 00–02 and the operations layer is
+done — see the pending-work snapshot above for what freezing would mean
+deferring.
 
-The moment you catch yourself adding a feature instead of finishing one, that's
-the answer.
+The moment you catch yourself adding a feature instead of finishing one,
+that's the answer.

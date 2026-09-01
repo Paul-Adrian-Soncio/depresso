@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { KeyRound } from "lucide-react";
+import { KeyRound, FileText } from "lucide-react";
 import { PeriodSwitcher } from "@/components/period-switcher";
 import { HeroCopy } from "@/components/hero-copy";
 import { HeroScene } from "@/components/hero-scene";
@@ -16,6 +16,15 @@ export default function Home() {
         </span>
         <div className="flex items-center gap-3">
           <PeriodSwitcher />
+          <Link
+            href="/case-study"
+            aria-label="Case study"
+            title="Case study"
+            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+          >
+            <FileText size={13} />
+            Case study
+          </Link>
           <Link
             href="/admin"
             aria-label="Admin"
