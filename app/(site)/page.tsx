@@ -48,17 +48,19 @@ export default function Home() {
         </div>
         <MenuGrid />
       </section>
-      <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-8 pb-24">
-        <div className="flex flex-col gap-2">
+      <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-8 pb-24 lg:flex-row lg:items-start">
+        <div className="flex w-full max-w-sm flex-none flex-col gap-2">
           <h2 className="text-2xl font-bold tracking-[-0.025em] text-ink">
             Build the room
           </h2>
-          <p className="max-w-md font-body text-base leading-relaxed text-ink-2">
+          <p className="font-body text-base leading-relaxed text-ink-2">
             Four loops, four faders. Set it how you like it and we will
             remember.
           </p>
         </div>
-        <AmbientMixer />
+        <div className="w-full flex-1">
+          <AmbientMixer />
+        </div>
       </section>
     </>
   );

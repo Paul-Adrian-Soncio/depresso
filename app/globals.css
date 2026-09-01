@@ -166,6 +166,73 @@ body {
   top: 1rem;
 }
 
+/*
+ * Ambient mixer sliders: a filled track up to the thumb (via the --fill
+ * custom property each track sets inline) plus an explicit accent-colored
+ * thumb. `accent-color` alone doesn't reliably color a range input's thumb
+ * across engines, so this styles both parts by hand instead.
+ */
+.ambience-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--accent) var(--fill, 0%),
+    var(--line) var(--fill, 0%)
+  );
+}
+
+.ambience-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  margin-top: 0;
+  transition: transform var(--duration-fast) var(--ease-quiet);
+}
+
+.ambience-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.ambience-slider::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-quiet);
+}
+
+.ambience-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
+.ambience-slider::-moz-range-track {
+  height: 3px;
+  border-radius: var(--radius-lg);
+  background: transparent;
+}
+
+.ambience-slider:disabled {
+  cursor: not-allowed;
+}
+
+.ambience-slider:disabled::-webkit-slider-thumb {
+  background: var(--ink-3);
+}
+
+.ambience-slider:disabled::-moz-range-thumb {
+  background: var(--ink-3);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

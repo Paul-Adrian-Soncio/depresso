@@ -32,7 +32,7 @@ The one mechanic that makes someone send the link to a friend. **Pick two, three
 |---|---|---|
 | Time-of-day ambience | `FE` `L` | Palette, hero art, ambient audio and copy all shift with the clock. Late night drops the lights and changes the greeting to *still up?* **Strongest single differentiator** — it makes the site feel like it exists in time rather than having been authored once. |
 | Persistent lofi player | `FE` `L` | Survives route changes, visualizer driven by real Web Audio frequency data, keyboard shortcuts, remembers volume and position. Quietly the hardest frontend problem here — forces app-level state and persistent layout. |
-| Ambient sound mixer | `FE` `M` | Independent loops for rain, chatter, vinyl crackle, espresso hiss, each on its own gain node with a slider. Save a named mix. Cheap to build, disproportionately memorable. |
+| Ambient sound mixer | `FE` `M` | ✅ **Done.** Independent loops for rain, chatter, vinyl crackle, espresso hiss, each on its own gain node with a slider, mix persisted via `localStorage`. Tracks sourced from Pixabay (see `docs/DECISIONS.md`). |
 | Animated café interior | `FE` `L` | Hand-made scene with parallax depth, drifting steam, rain on the window, a cat that shifts occasionally. Highest effort, highest "who made this" reaction. Layered SVG or canvas — a stock photo undoes the whole effect. |
 | Mood-based ordering | `FS` `M` | "How are you feeling?" → a drink. Fits the name so well it feels inevitable. Store the mapping server-side so the admin can edit it. |
 | A menu with a voice | `FE` `S` | Existential Espresso. Monday Mocha. Cold Brew Contemplation. Copy is the cheapest differentiator you'll ever ship — write it once and every screenshot improves. |

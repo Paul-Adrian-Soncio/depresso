@@ -335,16 +335,26 @@ action, which moves the order out of the active statuses `getActiveOrders()`
 returns — the next refresh drops it from both panels simultaneously, for
 free, since there was never a second copy of the list to keep in sync.
 
+### 2026-08-31 — Audio sourced from Pixabay
+All four ambient mixer tracks (`public/audio/rain.mp3`, `chatter.mp3`,
+`vinyl.mp3`, `espresso.mp3`) are sourced from Pixabay. Pixabay's content
+license is free for commercial and non-commercial use with no attribution
+legally required — same practical effect as CC0 for this project's
+purposes, satisfying the "CC0 or properly licensed" bar in `CLAUDE.md`.
+Individual track pages/creator credits weren't kept at download time; not
+worth re-tracking down after the fact given Pixabay's license doesn't
+require it, but if the eventual README grows a credits section, crediting
+"Pixabay" as the source is enough to be honest about where the audio came
+from without needing per-track attribution.
+
+**Consequence:** closes the "where does the audio come from" open question
+from Tier 01 — the files were already in place and wired into
+`lib/domain/ambience.ts` with sensible default levels, this was purely a
+documentation gap, not a missing feature.
+
 ---
 
 ## Open
-
-### Where does the audio come from?
-**Trigger: start during Phase 01, in the background.**
-
-Needs CC0 or properly licensed lofi tracks and ambient loops. Sourcing,
-trimming and clean looping takes longer than expected — the most commonly
-underestimated item on the whole plan.
 
 ### Which second backend loop?
 **Trigger: start of Phase 03.**
