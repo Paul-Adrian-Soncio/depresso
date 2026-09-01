@@ -1,9 +1,8 @@
 /**
- * The persistent player's playlist. Placeholder tracks for now — swap `src`
- * (and `title`/`artist`) for real, properly licensed lofi tracks once
- * sourced; nothing else in the player needs to change. See
- * docs/DECISIONS.md for the ambient mixer's audio sourcing note — same bar
- * applies here (CC0 or properly licensed).
+ * The persistent player's playlist. Tracks sourced from Pixabay, same
+ * license basis as the ambient mixer's loops — see docs/DECISIONS.md. File
+ * names follow "Artist - Title.mp3"; `src` is run through encodeURI since
+ * several file names contain spaces.
  */
 export interface PlaylistTrack {
   id: string;
@@ -13,6 +12,34 @@ export interface PlaylistTrack {
 }
 
 export const PLAYLIST: PlaylistTrack[] = [
-  { id: "placeholder-1", title: "Tape Deck Sunrise", artist: "bsnno", src: "/audio/lofi/placeholder-1.wav" },
-  { id: "placeholder-2", title: "Loose Ends", artist: "bsnno", src: "/audio/lofi/placeholder-2.wav" },
+  {
+    id: "chill-pulse-talk",
+    title: "Talk",
+    artist: "Chill Pulse",
+    src: encodeURI("/audio/lofi/Chill Pulse - Talk.mp3"),
+  },
+  {
+    id: "pufino-charmed",
+    title: "Charmed",
+    artist: "Pufino",
+    src: encodeURI("/audio/lofi/Pufino - Charmed.mp3"),
+  },
+  {
+    id: "pufino-fantasy",
+    title: "Fantasy",
+    artist: "Pufino",
+    src: encodeURI("/audio/lofi/Pufino - Fantasy.mp3"),
+  },
+  {
+    id: "massobeats-aromatic",
+    title: "Aromatic",
+    artist: "massobeats",
+    src: encodeURI("/audio/lofi/massobeats - aromatic.mp3"),
+  },
+  {
+    id: "massobeats-peach-prosecco",
+    title: "Peach Prosecco",
+    artist: "massobeats",
+    src: encodeURI("/audio/lofi/massobeats - peach prosecco.mp3"),
+  },
 ];

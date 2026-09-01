@@ -6,7 +6,46 @@ import { PLAYLIST } from "@/lib/domain/playlist";
 const VOLUME_STORAGE_KEY = "depresso-player-volume";
 const TRACK_STORAGE_KEY = "depresso-player-track";
 const DEFAULT_VOLUME = 70;
-const FREQUENCY_BAR_COUNT = 24;
+const FREQUENCY_BAR_COUNT = 16;
+// Lofi's energy lives in bass/mid — almost nothing above ~1/3 of the way up
+// a linear FFT bin range for this style of track (measured empirically:
+// bars mapped past this point sat pinned at the floor with zero variance
+// across frames regardless of what was playing). Capping the mapped range
+// here instead of spanning the full spectrum keeps every visible bar in
+// the part of the spectrum that's actually alive.
+const FREQUENCY_BIN_FRACTION = 0.22;
+
+/**
+ * Maps linearly-spaced FFT bins onto `barCount` bars using an
+ * exponentially-widening bin range per bar — narrow (1-2 bins) for the low
+ * bars, wide for the high ones, roughly one octave per step — over the
+ * bottom FREQUENCY_BIN_FRACTION of the spectrum. getByteFrequencyData's
+ * bins are linear in frequency, but music energy (and human hearing) is
+ * concentrated in the low end, so a 1:1 or evenly-split bin-to-bar mapping
+ * across the *full* range leaves the first few bars pegged and everything
+ * past them nearly flat.
+ */
+function frequencyBinsToBars(data: Uint8Array, barCount: number): number[] {
+  const usableBinCount = Math.max(barCount + 1, Math.floor(data.length * FREQUENCY_BIN_FRACTION));
+  const bars: number[] = [];
+
+  for (let i = 0; i < barCount; i++) {
+    const startBin = i === 0 ? 0 : Math.floor(usableBinCount ** (i / barCount));
+    const endBin = Math.max(startBin + 1, Math.floor(usableBinCount ** ((i + 1) / barCount)));
+
+    let sum = 0;
+    let count = 0;
+    for (let bin = startBin; bin < Math.min(endBin, usableBinCount); bin++) {
+      sum += data[bin];
+      count++;
+    }
+
+    const average = count > 0 ? sum / count : 0;
+    bars.push(Math.round((average / 255) * 100));
+  }
+
+  return bars;
+}
 
 function loadStoredVolume(): number {
   if (typeof window === "undefined") return DEFAULT_VOLUME;
@@ -94,7 +133,7 @@ export function usePlayer() {
     sourceRef.current = source;
 
     const analyser = context.createAnalyser();
-    analyser.fftSize = 64;
+    analyser.fftSize = 512;
     analyser.smoothingTimeConstant = 0.75;
     analyserRef.current = analyser;
 
@@ -119,10 +158,14 @@ export function usePlayer() {
     if (analyser && audio) {
       const data = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(data);
-      const bars = Array.from({ length: FREQUENCY_BAR_COUNT }, (_, i) => {
-        const value = data[i % data.length] ?? 0;
-        return Math.round((value / 255) * 100);
-      });
+      // getByteFrequencyData's bins are linearly spaced across the full
+      // frequency range, but music energy (and hearing) is concentrated in
+      // the low end — mapping bars 1:1 to linear bins left the first few
+      // bars pegged and everything past them nearly flat. Log-spacing each
+      // bar's slice of bins (narrow low, wide high, matching how an octave
+      // doubles in Hz each step) spreads visible movement across the whole
+      // row instead of just the first handful of bars.
+      const bars = frequencyBinsToBars(data, FREQUENCY_BAR_COUNT);
       setFrequencies(bars);
       setCurrentTime(audio.currentTime);
     }

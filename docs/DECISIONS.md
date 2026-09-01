@@ -406,9 +406,59 @@ later is a one-file edit; nothing else in the player needs to change.
   (`components/use-player.ts`) as a backstop that isn't subject to the same
   event-timing race.
 
+### 2026-09-01 — Real player tracks; visualizer needed a log-frequency remap
+Swapped the two placeholder tones in `lib/domain/playlist.ts` for five real
+tracks (Chill Pulse — "Talk", Pufino — "Charmed" and "Fantasy", massobeats
+— "Aromatic" and "Peach Prosecco"), sourced from
+[Free To Use](https://freetouse.com/music). File names contain spaces
+(`"Artist - Title.mp3"`); `src` values are run through `encodeURI` so they
+resolve correctly.
+
+**Licensing note, not fully clean-cut.** Free To Use's free-tier
+attribution license explicitly covers video platforms (YouTube, TikTok,
+Instagram, Facebook, Twitch); its FAQ separately states that "other website
+content" — which is what this is — needs a Commercial Plan subscription or
+a single-track license instead of just attribution. Decision made to keep
+these tracks and use them anyway, accepting that ambiguity, rather than
+switching to Pixabay (the ambient mixer's source, confirmed clear for this
+use). A dedicated "Built using" credits page is planned to list this
+alongside every other dependency/asset source — deliberately not folded
+into the site footer, so credits live in one place rather than scattered
+per-component.
+
+**The visualizer needed real tuning, not just real audio.** Once actual
+music was playing, the bars were visibly wrong: tall at the very start of
+the row, flat everywhere else, barely moving with the beat. Root cause:
+`getByteFrequencyData` returns linearly-spaced frequency bins, but music
+energy — especially lofi's — is concentrated in the bass/low-mid, so a 1:1
+or evenly-split bin-to-bar mapping put nearly all the audible signal into
+the first few bars and left the rest starved. Fixed in two steps, verified
+by sampling actual bar heights across frames during real playback rather
+than eyeballing it:
+1. `frequencyBinsToBars()` (`components/use-player.ts`) maps bars using an
+   exponentially-widening bin range per bar (narrow at the low end, wide at
+   the high end — roughly one octave per step), the standard technique real
+   spectrum visualizers use instead of linear bin-per-bar.
+2. Even with exponential spacing, the *last several* bars still sat
+   permanently pinned at the floor with zero frame-to-frame variance —
+   correct given these tracks have almost no energy above roughly a third
+   of the full FFT range, but it read as "not reacting." Capped the mapped
+   range to the bottom ~22% of bins (`FREQUENCY_BIN_FRACTION`) and dropped
+   the bar count from 24 to 16, so every visible bar sits inside the part
+   of the spectrum that's actually alive for this style of music, rather
+   than reserving visual space for a range that's reliably silent.
+
 ---
 
 ## Open
+
+### "Built using" credits page
+**Trigger: before Tier 03 / launch — needed regardless of when the freeze lands.**
+
+Needs to list every dependency and asset source, including the Free To Use
+player track attribution (see the 2026-09-01 entry above) and the Pixabay
+ambient-mixer attribution. Deliberately not folded into the site footer, so
+credits live in one place.
 
 ### Which second backend loop?
 **Trigger: start of Phase 03.**

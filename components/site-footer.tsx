@@ -8,6 +8,11 @@ import { PersistentPlayer } from "@/components/persistent-player";
  * demo badge is CLAUDE.md's rule 4 ("admit it's a demo") — this is its
  * first home; a "small persistent badge" fits naturally next to the
  * branding rather than needing its own dedicated spot.
+ *
+ * Asset/dependency credits (including the Free To Use music attribution —
+ * see docs/DECISIONS.md) live on a dedicated "Built using" page rather than
+ * here, so they don't crowd the footer and there's one place for the full
+ * list rather than scattering it per-component.
  */
 export function SiteFooter() {
   return (
