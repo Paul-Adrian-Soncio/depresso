@@ -4,16 +4,13 @@ import { Volume2, VolumeX } from "lucide-react";
 import { useAmbience } from "@/components/use-ambience";
 
 export function AmbientMixer() {
-  const { tracks, mix, muted, setLevel, toggleMute, started, loadErrors } =
-    useAmbience();
+  const { tracks, mix, muted, setLevel, toggleMute, loadErrors } = useAmbience();
 
   return (
     <div className="flex flex-col gap-5">
-      {!started && (
-        <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink-3">
-          Move a slider to start the room
-        </p>
-      )}
+      <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink-3">
+        Move a slider to start the room
+      </p>
       <div className="grid grid-cols-1 gap-x-10 gap-y-4 sm:grid-cols-2">
         {tracks.map((track) => {
           const isMuted = muted[track.id];
@@ -43,14 +40,16 @@ export function AmbientMixer() {
                 type="range"
                 min={0}
                 max={100}
-                value={isMuted ? 0 : level}
+                value={level}
                 disabled={isUnavailable}
                 onChange={(event) => setLevel(track.id, Number(event.target.value))}
                 style={{ "--fill": `${isMuted ? 0 : level}%` } as React.CSSProperties}
-                className="ambience-slider min-w-0 flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+                className={`ambience-slider min-w-0 flex-1 disabled:cursor-not-allowed disabled:opacity-50 ${
+                  isMuted ? "opacity-50" : ""
+                }`}
               />
               <span className="w-7 flex-none text-right font-mono text-[11px] tabular-nums text-ink-3">
-                {isUnavailable ? "—" : isMuted ? "0" : level}
+                {isUnavailable ? "—" : level}
               </span>
             </div>
           );

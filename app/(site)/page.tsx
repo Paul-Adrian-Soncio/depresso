@@ -11,11 +11,8 @@ export default function Home() {
   return (
     <>
       <header className="flex items-center justify-between px-8 py-6">
-        <span className="flex items-center gap-2">
-          <Mascot className="h-12 w-auto" />
-          <span className="font-display text-lg font-bold tracking-[-0.02em] text-ink">
-            Depresso
-          </span>
+        <span className="font-display text-lg font-bold tracking-[-0.02em] text-ink">
+          Depresso
         </span>
         <div className="flex items-center gap-3">
           <PeriodSwitcher />
@@ -35,6 +32,7 @@ export default function Home() {
         className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center gap-16 px-8 py-16 lg:flex-row lg:items-center lg:py-24"
       >
         <div className="flex w-full max-w-lg flex-none flex-col items-center gap-4 text-center lg:items-start lg:text-left">
+          <Mascot className="h-16 w-auto" />
           <HeroCopy />
         </div>
         <HeroScene className="w-full max-w-2xl flex-1 rounded-md border border-line" />

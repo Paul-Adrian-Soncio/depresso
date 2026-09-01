@@ -18,7 +18,7 @@ export function defaultMix(): AmbienceMix {
 
 export function defaultMuted(): AmbienceMuted {
   return Object.fromEntries(
-    AMBIENCE_TRACKS.map((track) => [track.id, false]),
+    AMBIENCE_TRACKS.map((track) => [track.id, true]),
   ) as AmbienceMuted;
 }
 

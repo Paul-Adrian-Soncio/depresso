@@ -12,7 +12,6 @@ import {
 } from "@/lib/domain/ambience";
 
 const STORAGE_KEY = "depresso-ambience-mix";
-const MUTED_STORAGE_KEY = "depresso-ambience-muted";
 
 function loadStoredMix(): AmbienceMix {
   if (typeof window === "undefined") return defaultMix();
@@ -29,24 +28,6 @@ function loadStoredMix(): AmbienceMix {
     return mix;
   } catch {
     return defaultMix();
-  }
-}
-
-function loadStoredMuted(): AmbienceMuted {
-  if (typeof window === "undefined") return defaultMuted();
-  try {
-    const raw = window.localStorage.getItem(MUTED_STORAGE_KEY);
-    if (!raw) return defaultMuted();
-    const parsed = JSON.parse(raw);
-    const muted = defaultMuted();
-    for (const track of AMBIENCE_TRACKS) {
-      if (typeof parsed[track.id] === "boolean") {
-        muted[track.id] = parsed[track.id];
-      }
-    }
-    return muted;
-  } catch {
-    return defaultMuted();
   }
 }
 
@@ -74,24 +55,19 @@ export function useAmbience() {
   const mixRef = useRef<AmbienceMix>(mix);
   const mutedRef = useRef<AmbienceMuted>(muted);
   const startPromiseRef = useRef<Promise<AudioContext> | null>(null);
-  // Persistence effects below must not write back to localStorage until
-  // after the hydration-correction effect has applied the stored value —
-  // otherwise the mount render's default state overwrites it. Both refs
-  // start "skip" and flip once, in mount order.
+  // The mix-persistence effect below must not write back to localStorage
+  // until after the hydration-correction effect has applied the stored
+  // value — otherwise the mount render's default state overwrites it.
   const skipMixWriteRef = useRef(true);
-  const skipMutedWriteRef = useRef(true);
 
   useEffect(() => {
     const storedMix = loadStoredMix();
-    const storedMuted = loadStoredMuted();
     mixRef.current = storedMix;
-    mutedRef.current = storedMuted;
     // Correcting SSR-safe defaults to the real localStorage value after
     // mount, not deriving state from props — the one-time setState here is
     // the standard fix for this class of hydration mismatch.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMix(storedMix);
-    setMuted(storedMuted);
   }, []);
 
   useEffect(() => {
@@ -103,16 +79,6 @@ export function useAmbience() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(mix));
   }, [mix]);
-
-  useEffect(() => {
-    mutedRef.current = muted;
-    if (skipMutedWriteRef.current) {
-      skipMutedWriteRef.current = false;
-      return;
-    }
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(MUTED_STORAGE_KEY, JSON.stringify(muted));
-  }, [muted]);
 
   useEffect(() => {
     return () => {
@@ -173,12 +139,22 @@ export function useAmbience() {
       mixRef.current = { ...mixRef.current, [id]: clamped };
       setMix(mixRef.current);
 
+      // Dragging above 0 implies wanting to hear the track — unmute it,
+      // same as any conventional volume control, rather than leaving the
+      // level updated but silent (the slider would feel unresponsive while
+      // muted, since moving it wouldn't audibly do anything). Dragging all
+      // the way to 0 is treated as muting: a slider at the far left with an
+      // "unmuted" icon would be a level with no way to tell it's silent.
+      const shouldBeMuted = clamped === 0;
+      if (mutedRef.current[id] !== shouldBeMuted) {
+        mutedRef.current = { ...mutedRef.current, [id]: shouldBeMuted };
+        setMuted(mutedRef.current);
+      }
+
       const context = contextRef.current;
       const gain = gainNodesRef.current[id];
       if (context && gain) {
-        if (!mutedRef.current[id]) {
-          gain.gain.setTargetAtTime(clamped / 100, context.currentTime, 0.05);
-        }
+        gain.gain.setTargetAtTime(shouldBeMuted ? 0 : clamped / 100, context.currentTime, 0.05);
       } else {
         ensureStarted();
       }
@@ -191,6 +167,15 @@ export function useAmbience() {
       const next = !mutedRef.current[id];
       mutedRef.current = { ...mutedRef.current, [id]: next };
       setMuted(mutedRef.current);
+
+      // Unmuting a track whose level is 0 would otherwise show "unmuted"
+      // while staying silent (0 volume either way) — bump it to the
+      // quietest audible level instead, so the mute button always produces
+      // sound rather than needing the slider dragged up separately.
+      if (!next && mixRef.current[id] === 0) {
+        mixRef.current = { ...mixRef.current, [id]: 1 };
+        setMix(mixRef.current);
+      }
 
       const context = contextRef.current;
       const gain = gainNodesRef.current[id];
