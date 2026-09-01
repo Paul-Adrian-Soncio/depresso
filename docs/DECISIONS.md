@@ -473,6 +473,32 @@ doc comment was also corrected here — it previously said the player tracks
 came from Pixabay, which was wrong; that's the ambient mixer's source, the
 player's tracks are from Free To Use.
 
+### 2026-09-02 — Afternoon retuned: warm/golden instead of a cool-palette variant
+User feedback: afternoon was barely distinguishable from morning. Checked —
+correct: every token differed from morning by only a handful of hex digits
+(`--ground` `#E7EAEC` vs `#DFE4E7`, an ~8-value RGB nudge), which defeated
+the point of the time-of-day system entirely for that one period.
+
+Two brightness-based fixes were tried and screenshotted against morning
+first (brighter/flatter, and cooler/greyer) — both were rejected as still
+too close to morning, even the one with passing "dramatic difference"
+framing. The fix that actually worked was changing axis, not degree: a
+warm/golden cast (afternoon sun through the window) rather than a
+brightness or saturation tweak. `--ground`/`--surface` themselves carry a
+visible amber tint now, not just `--accent`.
+
+**Consequence — this bends the palette's own stated rule.** Night Window's
+documented concept (`CLAUDE.md`) is a cool ground with one warm light
+source; a warm-toned ground for afternoon is a real departure from that,
+flagged explicitly and kept anyway on request, because the whole point was
+a *dramatic, unmistakable* shift and the on-concept options didn't deliver
+one. Re-verified WCAG contrast for every pair after the change (`ink`/
+`ink-2`/`ink-3`/`accent-text` against `ground`/`surface`, plus `on-accent`
+on `accent` against the 3:1 large-text/bold floor CLAUDE.md's own
+`--accent-text` workaround relies on) — all clear with margins comparable
+to the other three periods. `CLAUDE.md`'s token table updated to match;
+treat the code as source, per its own instruction.
+
 ---
 
 ## Open

@@ -18,19 +18,19 @@
 }
 
 [data-period="afternoon"] {
-  --ground: #DFE4E7;
-  --surface: #EEF1F3;
-  --surface-2: #D9DFE2;
-  --ink: #1B2126;
-  --ink-2: #47525A;
-  --ink-3: #525C64;
-  --accent: #A8631D;
-  --accent-text: #834C12;
+  --ground: #EFE9DF;
+  --surface: #F8F3EA;
+  --surface-2: #E7DFD1;
+  --ink: #2A2420;
+  --ink-2: #5C5346;
+  --ink-3: #655C4E;
+  --accent: #B06813;
+  --accent-text: #96590F;
   --on-accent: #FBF6EF;
-  --cool: #436674;
-  --line: #CED5D9;
-  --line-strong: #B2BCC2;
-  --ok: #487754;
+  --cool: #5C7C88;
+  --line: #E0D6C4;
+  --line-strong: #C7B99F;
+  --ok: #5C7C4E;
 }
 
 [data-period="dusk"] {
