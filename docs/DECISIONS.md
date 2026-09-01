@@ -352,6 +352,60 @@ from Tier 01 — the files were already in place and wired into
 `lib/domain/ambience.ts` with sensible default levels, this was purely a
 documentation gap, not a missing feature.
 
+### 2026-09-01 — Persistent lofi player: the deferred Tier 01 pick, built
+Picked up the persistent player deferred in the original Tier 01 decision
+(chosen against in favor of ambient ambience + mixer, "if that becomes a
+third pick later" — see the 2026-08-27 entry). The mixer's Web Audio
+plumbing (manual `AudioContext`, gain nodes, lazy-create-on-first-gesture)
+carried over directly; the player adds an `AnalyserNode` for a real
+frequency-driven visualizer and uses an `HTMLAudioElement` as the source
+(rather than useAmbience's fetch-and-decode `AudioBufferSourceNode`)
+because the player needs genuine seek/duration/currentTime, which an
+element gives for free and a raw buffer source does not.
+
+**Bar row doubles as visualizer and scrubber**, matching both the mockup
+and a reverse-engineered read of a similar Framer marketplace component:
+one row of bars, heights driven by `getByteFrequencyData` while playing,
+click/drag anywhere to seek — not a separate waveform plus a separate
+progress line. Track title/artist/skip controls (next/previous through a
+small placeholder `PLAYLIST` in `lib/domain/playlist.ts`) were added beyond
+what that reference component itself shows.
+
+**Placement:** originally a `fixed` bar spanning the viewport bottom, then
+moved into a proper `SiteFooter` (branding + the CLAUDE.md rule-4 demo
+badge on the left, player docked right) as a normal in-flow element —
+scrolls away like an ordinary footer rather than permanently occupying
+screen space. Mounted in `app/(site)/layout.tsx`, deliberately excluded
+from `/admin`, same reasoning as `ForceDusk` keeping the live period system
+out of the admin section: the `<audio>` element and its `AudioContext`
+graph need to survive navigation between public pages, and shouldn't bleed
+into a section meant to be isolated from the public site's live systems.
+
+**Real tracks not sourced yet** — `lib/domain/playlist.ts` currently points
+at two generated placeholder tones (`public/audio/lofi/placeholder-*.wav`)
+so the full mechanism (play/pause/seek/visualizer/persistence) could be
+built and verified end-to-end. Swapping in real, properly licensed tracks
+later is a one-file edit; nothing else in the player needs to change.
+
+**Two real bugs caught building this, both fixed:**
+- Percentage `height` on the bar `<span>`s resolved to `0` once the bars'
+  container sat inside a `flex-col` parent using `flex-1` — the same class
+  of bug the analytics hourly chart hit earlier (`docs/DECISIONS.md`,
+  analytics chart entry): a percentage height needs an ancestor with a
+  *resolved* height, and `flex-1`'s `flex-basis: 0%` starves that chain
+  before anything defines one. Fixed by giving the bar row `w-full
+  flex-none` instead of `flex-1` and letting the explicit `h-*` utility
+  actually apply.
+- Seeking always jumped to `0:00` regardless of where the bar was clicked.
+  Root cause: `<audio src={track.src}>` starts fetching as soon as it
+  mounts, and for a small local file the browser can fire `loadedmetadata`
+  before React finishes attaching that event handler — the event is missed
+  entirely and `duration` state stays `0` forever, so `seek(fraction *
+  duration)` always computed a target of `0`. Fixed by also reading
+  `audio.duration` directly off the DOM node in an effect
+  (`components/use-player.ts`) as a backstop that isn't subject to the same
+  event-timing race.
+
 ---
 
 ## Open
