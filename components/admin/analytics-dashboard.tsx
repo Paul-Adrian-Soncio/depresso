@@ -79,6 +79,18 @@ function HourlyChart({ hours }: { hours: HourlyVolume[] }) {
 }
 
 function WeeklyTable({ weeks }: { weeks: WeeklyVolume[] }) {
+  // The most recent week (by week_start, computed in the DB — see
+  // weekly_volume() in supabase/migrations) is still accumulating: its
+  // total will keep climbing until the week actually ends. Without calling
+  // that out, its row looks identical to every finished week, and since the
+  // current week's start date can be several days in the past by the time
+  // you're looking at it, that read as "nothing happened since then" rather
+  // than "this week isn't over yet."
+  const latestWeekStart = weeks.reduce(
+    (latest, week) => (week.weekStart > latest ? week.weekStart : latest),
+    weeks[0]?.weekStart ?? "",
+  );
+
   return (
     <div className="overflow-x-auto rounded-md border border-line">
       <table className="w-full border-collapse text-left">
@@ -93,17 +105,27 @@ function WeeklyTable({ weeks }: { weeks: WeeklyVolume[] }) {
           {weeks
             .slice()
             .reverse()
-            .map((week) => (
-              <tr key={week.weekStart} className="border-b border-line last:border-0">
-                <td className="px-4 py-2 font-mono text-sm text-ink">{formatWeek(week.weekStart)}</td>
-                <td className="px-4 py-2 font-mono text-sm tabular-nums text-ink-2">
-                  {week.orderCount}
-                </td>
-                <td className="px-4 py-2 font-mono text-sm tabular-nums text-ink-2">
-                  {formatPrice(week.revenueCents)}
-                </td>
-              </tr>
-            ))}
+            .map((week) => {
+              const isCurrentWeek = week.weekStart === latestWeekStart;
+              return (
+                <tr key={week.weekStart} className="border-b border-line last:border-0">
+                  <td className="px-4 py-2 font-mono text-sm text-ink">
+                    {formatWeek(week.weekStart)}
+                    {isCurrentWeek && (
+                      <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.1em] text-accent-text">
+                        In progress
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2 font-mono text-sm tabular-nums text-ink-2">
+                    {week.orderCount}
+                  </td>
+                  <td className="px-4 py-2 font-mono text-sm tabular-nums text-ink-2">
+                    {formatPrice(week.revenueCents)}
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     </div>

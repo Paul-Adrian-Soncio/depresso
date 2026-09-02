@@ -12,6 +12,7 @@ export interface MenuItemWithAvailability {
   soldOutReason: string | null;
   outOfStock: boolean;
   missingIngredient: string | null;
+  ingredients: string[];
 }
 
 /**
@@ -45,10 +46,16 @@ export async function getMenu(): Promise<MenuItemWithAvailability[]> {
   // once in this seed data, and picking the first is simpler than trying
   // to rank them.
   const missingIngredientByMenuItem = new Map<string, string>();
+  const ingredientsByMenuItem = new Map<string, string[]>();
   for (const row of recipes ?? []) {
     const stock = row.ingredients?.stock_quantity ?? 0;
     if (stock < row.quantity_required && !missingIngredientByMenuItem.has(row.menu_item_id)) {
       missingIngredientByMenuItem.set(row.menu_item_id, row.ingredients?.name ?? "an ingredient");
+    }
+    if (row.ingredients?.name) {
+      const list = ingredientsByMenuItem.get(row.menu_item_id) ?? [];
+      list.push(row.ingredients.name);
+      ingredientsByMenuItem.set(row.menu_item_id, list);
     }
   }
 
@@ -65,6 +72,7 @@ export async function getMenu(): Promise<MenuItemWithAvailability[]> {
       soldOutReason: item.sold_out_reason,
       outOfStock: missingIngredient !== null,
       missingIngredient,
+      ingredients: ingredientsByMenuItem.get(item.id) ?? [],
     };
   });
 }

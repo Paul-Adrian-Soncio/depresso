@@ -578,6 +578,52 @@ timeline update live without a refresh, and forced an actual decline
 path recovers cleanly. Test orders cleaned up afterward by exact id, per
 the standing "never target cleanup by a shared display field" lesson.
 
+### 2026-09-02 — Weekly analytics wasn't stale, just mislabeled
+User report: analytics hadn't updated since Aug 31, days after real orders
+kept landing (order-ahead flow shipped the same day). Checked directly
+against the DB — the data was never stale: `weekly_volume()`'s SQL groups
+by `date_trunc('week', created_at)`, so every order from Aug 31 onward
+(including today's) already lands in that one row. The row was real and
+correct; it just displayed as `"Aug 31"` with nothing distinguishing it
+from a fully-finished week, so it read as the last thing that ever
+happened instead of the current, still-accumulating week.
+
+**Fix is a label, not a query change** — `WeeklyTable`
+(`components/admin/analytics-dashboard.tsx`) now tags whichever row has the
+latest `week_start` with a small "In progress" marker. Considered also
+correcting `date_trunc('week', ...)` to the cafe's UTC+8 local week
+(matching the correction `busiest_hours` already has for hour-of-day) but
+kept that separate — real but much smaller (only affects orders placed
+very late Sunday/early Monday cafe time), not what caused what was
+actually reported.
+
+### 2026-09-02 — Menu item detail modal, ingredients added to getMenu()
+Clicking a card body on `/menu` opens a modal with the drink's name, its
+existing witty description (`menu_items.description` — no new copy needed,
+that field already carries the voice), and its ingredient list, with its
+own "Add to cart" button. The small `+` on the card itself still adds
+directly with a `stopPropagation` so quick-adding from the grid doesn't
+also pop the modal open.
+
+**`getMenu()` didn't have ingredient names to show.** It already joined
+`recipe_items` → `ingredients` to derive `outOfStock`/`missingIngredient`,
+but only read `stock_quantity` off that join, discarding `name`. Added an
+`ingredients: string[]` field, built off the same query — no new query,
+just keeping data that was already being fetched.
+
+**Markup shape:** the card is a `div[role="button"]` (not a `<button>`)
+wrapping a real `<button>` for the add control — nesting an interactive
+element inside a native `<button>` is invalid HTML and breaks its
+semantics, so the outer element can't be a button even though it behaves
+like one. Sold-out/out-of-stock cards don't open the modal at all — no
+"details, but can't order" state to design for.
+
+Homepage's read-only preview (`MenuCardPreview`) intentionally doesn't get
+this — considered adding it there too with the modal's button linking out
+to `/menu` instead of adding directly, decided against it: keeps the
+"homepage previews, /menu orders" split from the 2026-09-02 order-ahead
+entry clean rather than introducing a second modal variant.
+
 ---
 
 ## Open
