@@ -59,6 +59,44 @@ export async function getActiveOrders(): Promise<QueueOrder[]> {
   }));
 }
 
+/**
+ * A single order by id, any status — unlike getActiveOrders this isn't
+ * filtered to in-motion orders, since the customer-facing status page
+ * (app/order/[id]) needs to keep showing the order once it's completed or
+ * cancelled too, not stop resolving once it leaves the active set.
+ */
+export async function getOrderById(orderId: string): Promise<QueueOrder | null> {
+  const supabase = createServiceRoleClient();
+
+  const { data: order, error: orderError } = await supabase
+    .from("orders")
+    .select("id, customer_name, status, total_cents, created_at")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (orderError) throw orderError;
+  if (!order) return null;
+
+  const { data: items, error: itemsError } = await supabase
+    .from("order_items")
+    .select("quantity, menu_items (name)")
+    .eq("order_id", order.id);
+
+  if (itemsError) throw itemsError;
+
+  return {
+    id: order.id,
+    customerName: order.customer_name,
+    status: order.status,
+    totalCents: order.total_cents,
+    createdAt: order.created_at,
+    items: (items ?? []).map((row) => ({
+      menuItemName: row.menu_items?.name ?? "Unknown item",
+      quantity: row.quantity,
+    })),
+  };
+}
+
 const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   received: "brewing",
   brewing: "ready",

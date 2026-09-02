@@ -528,6 +528,56 @@ then settles to `late` and stays there, cookie correctly set. Re-verified
 the original back-navigation fix (manual override survives browser back)
 still holds after this change.
 
+### 2026-09-02 — Order-ahead flow built: cart, checkout, live order status
+Picked over Staff POS as the next big feature, on the reasoning that the
+site "feels less interactive" — POS only fixes the admin/backend half
+(gives a hands-on way to drive the existing simulate-orders loop), while
+nothing in the current build gives a public visitor something with a real
+consequence. Order-ahead is the one piece nothing else substitutes for.
+
+**Menu moved off the homepage onto its own `/menu` page.** Originally built
+inline (add-to-cart directly on the homepage's existing menu grid), then
+reconsidered on review: the homepage now shows a read-only preview
+(`MenuGridPreview`/`MenuCardPreview`, no client interactivity at all, no
+cart button) so a visitor can still see what's on offer, with a "See the
+menu" button and a header nav link routing to `/menu` for actual ordering.
+Split the shared card visuals into `MenuCardShell` (plain, server-
+renderable) so the preview path never needs `"use client"`.
+
+**Cart** (`components/use-cart.ts` + `CartProvider`) is a small
+localStorage-persisted store, same shape as the ambient mixer's mix and the
+player's volume — starts empty, corrected after mount. Scoped in
+`app/(site)/layout.tsx` alongside `PeriodProvider`, since the add side
+(menu cards) and the read side (header cart drawer) are siblings.
+
+**Checkout's simulated decline/retry was the one part worth getting the
+framing right on**, not just the mechanics — flagged directly: a real
+"sometimes it fails" flow risks reading as broken rather than demonstrated
+on purpose. Addressed with explicit upfront copy ("declines happen on
+purpose sometimes"), a calm non-alarm decline state (no red banners), low
+odds (1 in 8), and a retry that's always a fresh independent roll — never
+structurally stuck. `app/(site)/checkout/actions.ts`'s `checkout()` wraps
+the existing `placeOrder()` (unchanged) with this gate in front of it.
+
+**Order status page** (`/order/[id]`) polls `/api/order/[id]` every 2.5s
+rather than using Supabase Realtime — the page has no auth and `orders` has
+no public RLS policy, so a direct client subscription would mean opening
+that up broadly; polling through the existing server-only lookup
+(`getOrderById`, new in `lib/db/orders.ts`) keeps the same
+server-owns-data-access rule the rest of the app already follows. Stops
+polling once the order reaches a terminal state.
+
+**Verified end-to-end against the real dev database**, not just the build:
+added items from `/menu`, confirmed the homepage preview has zero
+add-to-cart controls, walked checkout through to a real DB row (correct
+customer name, item, price, stock genuinely deducted via the same
+`deduct_stock_for_order` path simulation mode uses), advanced the order via
+the admin panel while the status page tab stayed open and watched the
+timeline update live without a refresh, and forced an actual decline
+(hit naturally at ~1-in-8 odds after enough attempts) to confirm the retry
+path recovers cleanly. Test orders cleaned up afterward by exact id, per
+the standing "never target cleanup by a shared display field" lesson.
+
 ---
 
 ## Open
