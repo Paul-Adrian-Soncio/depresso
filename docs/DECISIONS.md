@@ -624,6 +624,47 @@ to `/menu` instead of adding directly, decided against it: keeps the
 "homepage previews, /menu orders" split from the 2026-09-02 order-ahead
 entry clean rather than introducing a second modal variant.
 
+### 2026-09-02 — Public queue display, picked over Staff POS
+Chose the "Order queue display" backlog item over Staff POS as the next
+operations-layer piece — smaller and, per the user's framing, specifically
+wanted as a public screen anyone can open (not the admin-only barista view
+that already exists in `/admin/orders`).
+
+**Not the same thing as the admin's PickupBoard usage.** `PickupBoard`
+(`components/admin/pickup-board.tsx`) already existed and was already
+close to this shape, but it only ever rendered inside the auth-gated
+`/admin/orders`. `/queue` is a new, unauthenticated public page reusing
+that same component (plus `ActivityFeed`) directly rather than duplicating
+them — both were already framework-agnostic with no admin-only dependency,
+so importing them from `components/admin/` into a public page was the
+lower-risk move over relocating files.
+
+**Two new capabilities, deliberately narrow in what each can do:**
+- A "Run the queue" toggle (`PublicQueueController`, same shape as admin's
+  `SimulationController`) that calls a new `/api/queue/tick` — unlike
+  admin's `/api/simulation/tick`, this one *only* advances an order already
+  in the queue via the existing `advanceRandomActiveOrder()`; it never
+  calls `placeOrder()` or creates anything. That's what makes it safe to
+  leave outside the admin proxy gate (verified directly: unauthenticated
+  `POST /api/queue/tick` → 200, unauthenticated `POST /api/simulation/tick`
+  → still 401, so the public route didn't accidentally widen the existing
+  gate).
+- A per-order "Picked up" button on ready orders, calling a new
+  `markPickedUp()` action (`app/(site)/queue/actions.ts`) — deliberately
+  narrower than admin's `advanceOrder`: hardcoded to the single
+  `ready -> completed` transition, and guarded with `.eq("status", "ready")`
+  so a stale/duplicate click is a no-op rather than corrupting a different
+  transition. A visitor can clear a finished order without the admin
+  password, but can't skip a waiting order past brewing or touch anyone's
+  order that isn't actually ready.
+
+Verified end-to-end against the real database: placed a real order through
+checkout, watched it appear on `/queue`, ticked it through to ready,
+clicked "Picked up," confirmed it disappeared from the board and landed as
+`completed` in the database — and confirmed the order count only grew by
+the orders actually placed through checkout, nothing fabricated by the
+tick endpoint itself. Test orders cleaned up by exact id afterward.
+
 ---
 
 ## Open

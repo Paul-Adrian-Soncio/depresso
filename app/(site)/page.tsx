@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { KeyRound, FileText, UtensilsCrossed } from "lucide-react";
+import { KeyRound, FileText, UtensilsCrossed, Coffee } from "lucide-react";
 import { PeriodSwitcher } from "@/components/period-switcher";
 import { HeroCopy } from "@/components/hero-copy";
 import { HeroScene } from "@/components/hero-scene";
@@ -24,6 +24,15 @@ export default function Home() {
           >
             <UtensilsCrossed size={13} />
             Menu
+          </Link>
+          <Link
+            href="/queue"
+            aria-label="Pickup screen"
+            title="Pickup screen"
+            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+          >
+            <Coffee size={13} />
+            Queue
           </Link>
           <Link
             href="/case-study"
