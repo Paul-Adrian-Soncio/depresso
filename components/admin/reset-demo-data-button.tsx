@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { RotateCcw } from "lucide-react";
-import { resetDemoDataAction } from "@/app/admin/(dashboard)/reset/actions";
+import { resetDemoDataAction } from "@/app/admin/(dashboard)/admincontrols/actions";
 
 type Status = { orders: number; orderItems: number } | "error" | null;
 

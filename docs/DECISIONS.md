@@ -769,6 +769,56 @@ space into the checkout name field inserts the character normally
 space on `/admin` (where no player or audio element exists) is inert with
 no errors.
 
+### 2026-09-04 — Corkboard guestbook built; /admin/reset renamed to /admin/admincontrols
+Picked up the last unpicked Tier 02 item. New `corkboard_notes` table (RLS
+enabled, no public write policy — every insert goes through
+`submitCorkboardNote`'s service-role client, same server-owns-writes rule
+as orders/checkout). Public write, rate-limited server-side: one note per
+IP per 3-minute window, checked against that IP's most recent post rather
+than counting posts in a window, so old activity from an IP never matters,
+only how recently they last posted. `poster_ip` is stored for rate
+limiting only and is never selected into anything a visitor or the admin
+note list can see.
+
+**Moderation is reactive, not pre-approval** — a note goes live the moment
+it's posted (the site already leans on things feeling alive/live
+elsewhere: simulation mode, the public queue), and an admin removes
+anything that shouldn't be up after the fact, on request. That control was
+explicitly asked to go on "the secret page" rather than a new ordinary
+admin tab — **`/admin/reset` was renamed to `/admin/admincontrols`** and
+now hosts both the demo-data reset and corkboard moderation side by side:
+one page consolidating every control that's either global/shared-database
+(reset) or unmoderated-by-default (notes), kept out of `AdminNav` the same
+way the old reset page was. Updated the one component
+(`reset-demo-data-button.tsx`) and two doc comments
+(`lib/domain/seed-generation.ts`, `supabase/seed-data/generate.ts`) that
+referenced the old path.
+
+**Deliberately shipped with an empty board**, against CLAUDE.md's own
+"no empty states on arrival" rule — asked directly whether to seed
+placeholder notes in the site's voice, and the explicit answer was no,
+the user wants to write the first few themselves. Both the homepage
+preview and the full page handle a genuinely empty board gracefully
+("Nothing pinned yet") rather than assuming there's always something to
+show, unlike the menu/orders/stock, which do get to assume that.
+
+**A real bug caught in testing, not just a features check:** the very
+first live-fire test produced a React warning — "Can't perform a state
+update on a component that hasn't mounted yet" — from `CorkboardForm`.
+`router.refresh()` after a successful post re-renders the server tree the
+form itself lives inside, which can unmount that component instance
+before the next line (`setMessage("")`) runs. Fixed with an
+`isMountedRef` set in a cleanup effect, checked before any post-await
+state update — the standard fix for this exact class of bug. Re-verified
+after the fix: zero console/page errors across a full post → homepage
+preview → admin moderation list → remove → confirm-gone-everywhere cycle,
+run against the real database with a real IP-based rate limit in play
+(one test attempt was itself correctly rate-limited by an earlier manual
+post, which is what surfaced needing to distinguish "rate-limited" from
+"actually broken" during debugging). The user's own first real note was
+never touched by any of this — every test note was identified and removed
+by exact id.
+
 ---
 
 ## Open

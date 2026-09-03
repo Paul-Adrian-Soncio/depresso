@@ -20,7 +20,7 @@ import { generateOrderHistory } from "../../lib/domain/seed-generation";
 
 // Fixed seed so the generated file is reproducible between runs — easier to
 // review a diff when re-running doesn't reshuffle everything. The runtime
-// reset action (app/admin/reset) seeds generateOrderHistory differently, on
+// reset action (app/admin/admincontrols) seeds generateOrderHistory differently, on
 // purpose — see lib/domain/seed-generation.ts.
 const GENERATOR_SEED = 20260828;
 

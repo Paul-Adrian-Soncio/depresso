@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { KeyRound, FileText, UtensilsCrossed, Coffee } from "lucide-react";
+import { KeyRound, FileText, UtensilsCrossed, Coffee, Pin } from "lucide-react";
 import { PeriodSwitcher } from "@/components/period-switcher";
 import { HeroCopy } from "@/components/hero-copy";
 import { HeroScene } from "@/components/hero-scene";
 import { MenuGridPreview } from "@/components/menu-grid-preview";
 import { AmbientMixer } from "@/components/ambient-mixer";
+import { CorkboardPreview } from "@/components/corkboard-preview";
 import { Mascot } from "@/components/mascot";
 
 export default function Home() {
@@ -33,6 +34,15 @@ export default function Home() {
           >
             <Coffee size={13} />
             Queue
+          </Link>
+          <Link
+            href="/corkboard"
+            aria-label="Corkboard"
+            title="Corkboard"
+            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+          >
+            <Pin size={13} />
+            Corkboard
           </Link>
           <Link
             href="/case-study"
@@ -80,6 +90,23 @@ export default function Home() {
           </Link>
         </div>
         <MenuGridPreview />
+      </section>
+      <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-[22px] px-8 pb-24">
+        <div className="flex items-baseline justify-between gap-4">
+          <div className="flex items-baseline gap-4">
+            <h2 className="text-[30px] font-bold tracking-[-0.025em] text-ink">
+              The corkboard
+            </h2>
+            <p className="font-mono text-xs text-ink-3">Whatever people leave behind</p>
+          </div>
+          <Link
+            href="/corkboard"
+            className="flex flex-none items-center gap-1.5 rounded-md bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent transition-colors duration-base hover:opacity-90"
+          >
+            Pin a note
+          </Link>
+        </div>
+        <CorkboardPreview />
       </section>
       <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-8 pb-24 lg:flex-row lg:items-start">
         <div className="flex w-full max-w-sm flex-none flex-col gap-2">

@@ -2,7 +2,7 @@
  * The core order-history generator, shared between two callers:
  *  - supabase/seed-data/generate.ts (build time) — serializes this into
  *    supabase/seed.sql, restored by `supabase db reset`.
- *  - the hidden admin reset action (app/admin/reset) — calls this directly
+ *  - the hidden admin reset action (app/admin/admincontrols) — calls this directly
  *    at request time to regenerate the same shape of data against the live
  *    database, since there's no way to run the Supabase CLI from a deployed
  *    server action.

@@ -53,7 +53,7 @@ item here is chosen because a reviewer can watch the loop close in ten seconds.
 | Order-ahead flow | `FS` `L` | ✅ **Done.** Cart (`/menu`, persisted) → simulated checkout (`/checkout`, name + fake gateway with a low-odds decline and an always-recoverable retry) → live status timeline (`/order/[id]`, polls and auto-advances). Homepage keeps a read-only menu preview ("Order a drink" links out); ordering lives on its own page. Verified end to end against the real database, including a genuine decline/retry. |
 | Loyalty stamp card | `FS` `M` | Auth, persistence and a small rule engine in a very small surface area — a good first backend feature. Seed the demo account at 7 of 10 stamps so the reward is three clicks away. |
 | Track request queue | `FS` `L` | Visitors upvote what plays next, live. **Superseded** — the order queue (built) uses the same plumbing, is more relevant, and needed no music licensing. |
-| Corkboard guestbook | `FS` `M` | Notes pinned to a board. CRUD plus rate limiting plus a moderation queue in the admin. Small feature, but **"I thought about abuse" is a senior signal** that almost no junior portfolio shows. |
+| Corkboard guestbook | `FS` `M` | ✅ **Done**, at `/corkboard` (preview on the homepage). Public post, no login — name optional, falls back to "Anonymous". Server-side rate limit (one note per IP per 3 minutes, never a client-side-only cooldown). Notes go live immediately; moderation/removal lives on the hidden `/admin/admincontrols` page. Deliberately launched with an empty board on request, not seeded. |
 | Shop analytics | `FS` `M` | ✅ **Done.** Most-ordered drink, busiest hour, weekly volume — computed in SQL from the seeded orders. |
 
 ---
@@ -90,7 +90,7 @@ study loses to a plainer one that explains itself.
 |---|---|---|
 | Case study page | `M` | ✅ **Done**, at `/case-study` — also absorbs the "Built using" credits item below rather than shipping as a separate page. Problem, three decisions with tradeoffs (stock race condition, time-of-day system, simulation mode), a real debugging story (the player visualizer's frequency mapping). Linked from the homepage header. |
 | Dev-mode overlay | `FE` `M` | A hidden toggle annotating the live UI with what's underneath: which component, which endpoint, which query. Nerdy, memorable, and it forces you to genuinely understand your own architecture. |
-| Demo reset | `FS` `S` | ✅ **Done**, at `/admin/reset` — not linked from the admin nav (see `docs/DECISIONS.md`: it's a shared-database action, kept off the surface any reviewer with the demo password could reach). One button restores seed state, freshly regenerated rather than replaying the exact same rows every time. |
+| Demo reset | `FS` `S` | ✅ **Done**, at `/admin/admincontrols` — not linked from the admin nav (see `docs/DECISIONS.md`: it's a shared-database action, kept off the surface any reviewer with the demo password could reach). One button restores seed state, freshly regenerated rather than replaying the exact same rows every time. Shares the page with corkboard note moderation. |
 | Performance & a11y report | `S` | Lighthouse numbers and an axe pass in the README with real figures, not a badge. And if the numbers are bad you learn it before an interviewer does. |
 | README that respects the reader | `S` | What it is, how to run it, architecture in one diagram, honest limitations section. The limitations section is what makes the rest believable. |
 

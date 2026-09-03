@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { resetDemoData } from "@/lib/db/reset-demo-data";
+import { deleteCorkboardNote } from "@/lib/db/corkboard";
 
 export async function resetDemoDataAction() {
   const result = await resetDemoData();
@@ -13,4 +14,12 @@ export async function resetDemoDataAction() {
   revalidatePath("/");
 
   return result;
+}
+
+export async function removeCorkboardNoteAction(noteId: string) {
+  await deleteCorkboardNote(noteId);
+
+  revalidatePath("/admin/admincontrols");
+  revalidatePath("/corkboard");
+  revalidatePath("/");
 }

@@ -39,6 +39,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      corkboard_notes: {
+        Row: {
+          author_name: string
+          created_at: string
+          id: string
+          message: string
+          poster_ip: string | null
+        }
+        Insert: {
+          author_name?: string
+          created_at?: string
+          id?: string
+          message: string
+          poster_ip?: string | null
+        }
+        Update: {
+          author_name?: string
+          created_at?: string
+          id?: string
+          message?: string
+          poster_ip?: string | null
+        }
+        Relationships: []
+      }
       ingredients: {
         Row: {
           container_size: number | null
