@@ -61,3 +61,26 @@ export async function adjustStock(ingredientId: string, delta: number) {
   revalidatePath("/admin");
   revalidatePath("/");
 }
+
+/**
+ * Sets how many units of an ingredient's own tracking unit come in one
+ * container (e.g. 1000 for a 1000ml carton) — display/restock convenience
+ * only, per the 20260904002505 migration. Never touches stock_quantity or
+ * anything deduct_stock_for_order reads. `null` clears it (no container
+ * concept applies), which is the seeded default for e.g. Chamomile tea bag.
+ */
+export async function setContainerSize(ingredientId: string, containerSize: number | null) {
+  if (containerSize !== null && (!Number.isFinite(containerSize) || containerSize <= 0)) {
+    throw new Error("Container size must be a positive number or empty");
+  }
+
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase
+    .from("ingredients")
+    .update({ container_size: containerSize })
+    .eq("id", ingredientId);
+
+  if (error) throw error;
+
+  revalidatePath("/admin/stock");
+}

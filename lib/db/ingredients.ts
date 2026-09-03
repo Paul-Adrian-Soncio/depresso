@@ -8,6 +8,8 @@ export interface IngredientWithStatus {
   stockQuantity: number;
   lowStockThreshold: number;
   isLow: boolean;
+  /** Units of `unit` per container (e.g. 1000 for a 1000ml carton) — display/restock convenience only, null where no container concept applies. */
+  containerSize: number | null;
 }
 
 export async function getIngredients(): Promise<IngredientWithStatus[]> {
@@ -15,7 +17,7 @@ export async function getIngredients(): Promise<IngredientWithStatus[]> {
 
   const { data, error } = await supabase
     .from("ingredients")
-    .select("id, name, unit, stock_quantity, low_stock_threshold")
+    .select("id, name, unit, stock_quantity, low_stock_threshold, container_size")
     .order("name", { ascending: true });
 
   if (error) throw error;
@@ -28,5 +30,6 @@ export async function getIngredients(): Promise<IngredientWithStatus[]> {
     stockQuantity: row.stock_quantity,
     lowStockThreshold: row.low_stock_threshold,
     isLow: row.stock_quantity <= row.low_stock_threshold,
+    containerSize: row.container_size,
   }));
 }

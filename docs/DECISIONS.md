@@ -712,6 +712,44 @@ public `/queue`, and confirmed a second ticket left with no name landed
 with a real auto-generated ticket number. Test orders cleaned up by exact
 id afterward.
 
+### 2026-09-04 — Container-size display for ingredient stock
+User question: is tracking milk (and similar ingredients) by ml instead of
+by carton unusual? It isn't — real café/POS inventory (Square, Toast,
+etc.) tracks anything portioned out per drink by volume/weight for exactly
+this reason; a carton with 50ml left still reads as "1 carton" if tracked
+whole, which is worse, not more realistic. `unit`/`stock_quantity` were
+already modeling this correctly (`ml` for milk/syrup/cold brew, `g` for
+beans/cinnamon, `bag` for something consumed as a discrete whole unit).
+What was actually missing was a *display* layer on top — no way to see
+"roughly how many cartons is that" or restock by container.
+
+**Added `ingredients.container_size`** (new migration
+`20260904002505_ingredient_container_size.sql`) — nullable, numeric, units
+of the ingredient's own `unit` per container (1000 for a 1000ml milk
+carton, 750 for a syrup bottle). Deliberately display/restock-convenience
+only: `deduct_stock_for_order` and every other quantity in the system
+still read `stock_quantity` in the ingredient's real unit, completely
+unchanged. Seeded real values for everything with a genuine container
+concept (milk, oat milk, cold brew, espresso beans, syrup, cinnamon,
+energy drink); left `null` for Chamomile tea bag, which already tracks
+one-per-bag and has no meaningful container above that.
+
+**Admin Stock page** (`components/admin/stock-table.tsx`) now shows
+"≈ N.N containers" under the raw quantity, a "+ 1 container (Nml)"
+quick-restock button alongside the existing flat `±10/50/100` steps, and —
+on request — an editable container-size field per ingredient (new
+`setContainerSize` action), not just seed-time-only values, so a café
+switching suppliers to a different carton size isn't stuck.
+
+**Migration applied to the live linked project** (`supabase db push
+--linked`), types regenerated (`supabase gen types typescript --linked`),
+and existing rows backfilled by exact ingredient name (not seed-script
+regeneration, so it took effect without needing a demo reset). Verified
+live: an ingredient seeded with no container size (`none` in the field)
+correctly showed no container math; setting one to 24 immediately produced
+"≈ 5.0 containers" and a working restock-by-container button; reverted the
+test value back to `null` afterward.
+
 ---
 
 ## Open

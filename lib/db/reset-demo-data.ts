@@ -87,6 +87,7 @@ export async function resetDemoData(): Promise<{ orders: number; orderItems: num
       unit: ing.unit,
       stock_quantity: ing.stockQuantity,
       low_stock_threshold: ing.lowStockThreshold,
+      container_size: ing.containerSize ?? null,
     };
   });
   await batchInsert("ingredients", supabase, ingredientRows);
