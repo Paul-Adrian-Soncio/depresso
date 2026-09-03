@@ -665,6 +665,53 @@ clicked "Picked up," confirmed it disappeared from the board and landed as
 the orders actually placed through checkout, nothing fabricated by the
 tick endpoint itself. Test orders cleaned up by exact id afterward.
 
+### 2026-09-02 — Staff POS built, the last operations-layer piece
+`/admin/pos`, new tab in `AdminNav`. One screen: a dense tap-to-add grid of
+orderable drinks on the left, a running ticket on the right (quantity
+adjust, optional name, total, charge). Closes the backlog's "four tabs
+open — thirty seconds, no code reading, entire fullstack claim proven"
+scenario: ring up a drink here and it deducts real stock, appears in
+`/admin/orders`, and shows on the public `/queue`, same as any other order.
+
+**No new order-creation logic needed** — `ringUp()`
+(`app/admin/(dashboard)/pos/actions.ts`) is a thin wrapper around the
+existing `placeOrder()`, the same race-safe function every other
+order-creation path already uses (order-ahead checkout, admin simulation
+mode). The POS's only real new work was the UI and its own local ticket
+state, not the backend.
+
+**Deliberately not the customer checkout's decline/retry simulation.**
+That framing (explicit "this is simulated" copy, low-odds decline, calm
+retry) made sense for demonstrating error handling in a customer-facing
+moment; a staff tool ringing up drink after drink shouldn't fight a fake
+gateway on every ticket. Charging here always resolves immediately.
+
+**Name is optional, with a real fallback, not a static placeholder.**
+Typing a name uses it; leaving it blank generates a random ticket number
+("Order #482") rather than a generic label like "Counter" for every
+walk-in — verified both paths land correctly in the database (a typed name,
+and a genuine auto-generated `Order #680` from leaving the field blank).
+
+**Own ticket state, not the shared cart.** The POS doesn't touch
+`CartProvider`/`use-cart.ts` — a barista's in-progress ticket has nothing
+to do with whatever a customer might have sitting in their own browser's
+cart on `/menu`, so it's plain local component state, not even
+localStorage-persisted (a ticket is meant to be rung up and cleared
+immediately, not resumed later).
+
+**Layout needed one small carve-out.** `AdminDashboardLayout` wraps every
+admin page in a `p-8` padding div; the POS is deliberately edge-to-edge
+(a dense grid wastes exactly the screen space padding would eat), so the
+layout became a client component checking `usePathname()` to skip that
+wrapper only for `/admin/pos` — every other admin page is unaffected.
+
+Verified end-to-end against the real database: rang up a two-item ticket
+with a typed name, confirmed the charge flow (idle → "Charging…" → "Order
+sent" → ticket clears), confirmed the order appeared correctly in the
+public `/queue`, and confirmed a second ticket left with no name landed
+with a real auto-generated ticket number. Test orders cleaned up by exact
+id afterward.
+
 ---
 
 ## Open
