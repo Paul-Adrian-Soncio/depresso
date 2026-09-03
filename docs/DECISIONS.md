@@ -750,6 +750,25 @@ correctly showed no container math; setting one to 24 immediately produced
 "≈ 5.0 containers" and a working restock-by-container button; reverted the
 test value back to `null` afterward.
 
+### 2026-09-04 — Global spacebar play/pause for the persistent player
+The last item on the 2026-09-02 pending-work snapshot. Added a `keydown`
+listener inside `usePlayer()` itself (the single source of truth for
+`toggle`, mounted exactly once via `PersistentPlayer` → `SiteFooter`), so
+it only ever exists on the public site — never reaches `/admin`, which has
+no player mounted at all.
+
+**The real work was the guard, not the listener.** Spacebar is an ordinary
+character in a text field, so the handler skips entirely when focus is on
+an `<input>`, `<textarea>`, `<select>`, a `contentEditable` element, or the
+player's own seek bar (`role="slider"`, which already binds arrow keys and
+treats space as "activate this control" rather than "toggle playback
+elsewhere"). Verified live: pressing space toggles play/pause from a
+neutral focus state and flips back correctly on a second press; typing a
+space into the checkout name field inserts the character normally
+("Jane Doe" preserved intact) and does not touch playback at all; pressing
+space on `/admin` (where no player or audio element exists) is inert with
+no errors.
+
 ---
 
 ## Open
@@ -761,32 +780,30 @@ landed — the "second loop" question is answered in practice, just never
 formally closed here. Leaving this entry as a pointer rather than deleting
 it, since it's the historical record of why those got picked.
 
-### Pending work snapshot — 2026-09-02
-Recorded on request, session paused here. Not urgent, just a clean
-re-entry point.
+### Pending work snapshot — 2026-09-04
+Replaces the 2026-09-02 snapshot, which was stale (order queue display,
+Staff POS, and the spacebar shortcut it listed have all since shipped).
 
-**Small, self-contained:**
-- Global spacebar play/pause shortcut for the persistent player — only the
-  focused scrubber's arrow-key seek exists today (`components/player-bars.tsx`).
-
-**Sizeable, unbuilt operations-layer pieces** (from the "Proposed" section
-above):
-- Order queue display — a read-only front-of-house screen, distinct from
-  `/admin/orders`'s barista-facing advance/cancel controls.
-- Staff POS — the last big piece, `L`-sized, a deliberately dense/fast
-  second design language.
+**Every "Proposed — operations layer" item is now done:** inventory &
+recipes, order queue display (`/queue`), Staff POS (`/admin/pos`),
+simulation mode. The full order-ahead flow (cart → checkout → live order
+status) is built and verified end to end. Genuinely nothing small or
+self-contained left unbuilt from the working list.
 
 **Unpicked Tier 02 items** (optional — already well past "pick two or
 three" with what's built): loyalty stamp card, corkboard guestbook.
 
-**Tier 03, gated behind a feature freeze:** dev-mode overlay,
-performance & a11y report, README.
+**Tier 03, gated behind a feature freeze:** case study — ✅ done
+(`/case-study`); demo reset — ✅ done (`/admin/reset`); dev-mode overlay,
+performance & a11y report, README all still open.
 
 ### When to freeze?
 **Trigger: not answerable yet — but hold onto it.** Worth actively
-considering now, given how much of Tier 00–02 and the operations layer is
-done — see the pending-work snapshot above for what freezing would mean
-deferring.
+considering now — every sizeable operations-layer feature and the full
+order-ahead flow are built and verified; what remains is either optional
+polish (loyalty card, guestbook) or the Tier 03 finishing work that's
+explicitly supposed to happen *after* a freeze, per the pending-work
+snapshot above.
 
 The moment you catch yourself adding a feature instead of finishing one,
 that's the answer.

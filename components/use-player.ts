@@ -239,6 +239,38 @@ export function usePlayer() {
     };
   }, []);
 
+  // Global spacebar play/pause — the only mount of PersistentPlayer lives
+  // in SiteFooter (public site only), so this never reaches the admin
+  // section. Skips when focus is inside a text input, textarea, select, or
+  // any contentEditable element — spacebar is an ordinary character there
+  // (typing a space in the checkout name field, an admin quantity input,
+  // etc.), and toggling playback out from under someone mid-typing would
+  // read as a bug, not a shortcut. Also skips role="slider" (the player's
+  // own seek bar) since that element already binds arrow keys for seeking
+  // and a space there is more naturally "activate this control" than
+  // "toggle playback elsewhere".
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.code !== "Space" && event.key !== " ") return;
+
+      const target = event.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const isTypingTarget =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target?.isContentEditable ||
+        target?.getAttribute("role") === "slider";
+      if (isTypingTarget) return;
+
+      event.preventDefault();
+      toggle();
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [toggle]);
+
   // Backstop for duration: the <audio> element starts fetching as soon as
   // it mounts with a `src`, and for a small local file the browser can fire
   // `loadedmetadata` before React finishes attaching that event handler —
