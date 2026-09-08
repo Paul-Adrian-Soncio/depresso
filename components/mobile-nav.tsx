@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, KeyRound, FileText, UtensilsCrossed, Coffee, Pin } from "lucide-react";
+import { SlideOverPanel } from "@/components/slide-over-panel";
 
 const LINKS = [
   { href: "/menu", label: "Menu", icon: UtensilsCrossed },
@@ -33,44 +34,39 @@ export function MobileNav() {
         <Menu size={16} />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex justify-end lg:hidden">
+      <SlideOverPanel
+        open={open}
+        onClose={() => setOpen(false)}
+        className="lg:hidden"
+        panelClassName="max-w-xs"
+      >
+        <div className="flex items-center justify-between">
+          <span className="font-display text-lg font-bold tracking-[-0.02em] text-ink">
+            Depresso
+          </span>
           <button
             type="button"
             aria-label="Close menu"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-ink/40"
-          />
-          <div className="relative flex h-full w-full max-w-xs flex-col gap-6 overflow-y-auto border-l border-line bg-ground p-6">
-            <div className="flex items-center justify-between">
-              <span className="font-display text-lg font-bold tracking-[-0.02em] text-ink">
-                Depresso
-              </span>
-              <button
-                type="button"
-                aria-label="Close menu"
-                onClick={() => setOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-ink-3 transition-colors duration-base hover:text-ink-2"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <nav className="flex flex-col gap-1">
-              {LINKS.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-md px-3 py-3 font-mono text-xs uppercase tracking-[0.1em] text-ink-2 transition-colors duration-base hover:bg-surface hover:text-ink"
-                >
-                  <Icon size={15} />
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
+            className="flex h-8 w-8 items-center justify-center rounded-full text-ink-3 transition-colors duration-base hover:text-ink-2"
+          >
+            <X size={16} />
+          </button>
         </div>
-      )}
+        <nav className="flex flex-col gap-1">
+          {LINKS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-md px-3 py-3 font-mono text-xs uppercase tracking-[0.1em] text-ink-2 transition-colors duration-base hover:bg-surface hover:text-ink"
+            >
+              <Icon size={15} />
+              {label}
+            </Link>
+          ))}
+        </nav>
+      </SlideOverPanel>
     </>
   );
 }
