@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { getOrderById } from "@/lib/db/orders";
 import { OrderStatus } from "@/components/order-status";
+import { BackLink } from "@/components/back-link";
 
 export default async function OrderStatusPage({
   params,
@@ -16,13 +15,7 @@ export default async function OrderStatusPage({
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-col gap-8 px-8 py-16">
-      <Link
-        href="/"
-        className="flex w-fit items-center gap-1.5 font-mono text-xs uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
-      >
-        <ArrowLeft size={13} />
-        Back to the menu
-      </Link>
+      <BackLink href="/menu" label="Back to the menu" />
       <OrderStatus initialOrder={order} />
     </main>
   );

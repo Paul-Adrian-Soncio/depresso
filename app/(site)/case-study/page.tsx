@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { PLAYLIST } from "@/lib/domain/playlist";
+import { BackLink } from "@/components/back-link";
 
 interface CreditEntry {
   name: string;
@@ -89,13 +88,7 @@ export default function CaseStudyPage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-16 px-8 py-16">
       <div className="flex flex-col gap-6">
-        <Link
-          href="/"
-          className="flex w-fit items-center gap-1.5 font-mono text-xs uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
-        >
-          <ArrowLeft size={13} />
-          Back to the site
-        </Link>
+        <BackLink />
         <div className="flex flex-col gap-3">
           <p className="font-mono text-xs uppercase tracking-[0.16em] text-accent-text">
             Case study
