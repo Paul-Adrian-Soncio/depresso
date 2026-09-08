@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { postNote } from "@/app/(site)/corkboard/actions";
 import { DevAnnotation } from "@/components/dev-annotation";
+import { RateLimitDialog } from "@/components/rate-limit-dialog";
 
 const MAX_LENGTH = 280;
 
@@ -17,14 +18,22 @@ export function CorkboardForm() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [rateLimitedSeconds, setRateLimitedSeconds] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   // router.refresh() re-renders the server tree this form lives inside,
   // which can unmount this component instance before the state updates
   // below get a chance to run — clearing the message field only matters if
-  // there's still a component here to see it cleared.
+  // there's still a component here to see it cleared. The explicit reset
+  // to true on mount matters because React Strict Mode (dev only) mounts
+  // every component twice to surface exactly this kind of bug: it reuses
+  // the same ref across its simulated mount → unmount → remount cycle, so
+  // without the reset, the *fake* unmount's cleanup would leave the ref
+  // stuck at false through the real, user-facing mount — making a
+  // genuinely successful post look like it silently failed to clear.
   const isMountedRef = useRef(true);
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
@@ -45,8 +54,7 @@ export function CorkboardForm() {
       }
 
       if (result.status === "rate-limited") {
-        const mins = Math.ceil(result.retryAfterSeconds / 60);
-        setError(`One note at a time — try again in about ${mins} minute${mins === 1 ? "" : "s"}.`);
+        setRateLimitedSeconds(result.retryAfterSeconds);
         return;
       }
 
@@ -102,6 +110,12 @@ export function CorkboardForm() {
         {isPending ? "Pinning…" : "Pin it"}
       </button>
     </div>
+    {rateLimitedSeconds !== null && (
+      <RateLimitDialog
+        retryAfterSeconds={rateLimitedSeconds}
+        onClose={() => setRateLimitedSeconds(null)}
+      />
+    )}
     </DevAnnotation>
   );
 }
