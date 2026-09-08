@@ -9,7 +9,7 @@
 export function Mascot({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="14 114 445 345"
+      viewBox="142.1 118.5 311.8 319.3"
       fill="var(--ink)"
       className={className}
       role="img"
