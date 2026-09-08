@@ -14,15 +14,17 @@ import { PeriodSwitcher } from "@/components/period-switcher";
  */
 export function SiteHeader() {
   return (
-    <header className="flex items-center justify-between px-8 py-6">
+    <header className="flex items-center justify-between gap-3 px-4 py-6 sm:px-8">
       <Link
         href="/"
         aria-label="Back to the site"
-        className="flex items-center gap-2 text-ink transition-colors duration-base hover:text-ink-2"
+        className="flex flex-none items-center gap-2 text-ink transition-colors duration-base hover:text-ink-2"
       >
-        <ArrowLeft size={16} className="text-ink-3" />
-        <MascotMark className="h-6 w-6" />
-        <span className="font-display text-lg font-bold tracking-[-0.02em]">Depresso</span>
+        <ArrowLeft size={16} className="flex-none text-ink-3" />
+        <MascotMark className="h-6 w-6 flex-none" />
+        <span className="hidden font-display text-lg font-bold tracking-[-0.02em] sm:inline">
+          Depresso
+        </span>
       </Link>
       <PeriodSwitcher />
     </header>

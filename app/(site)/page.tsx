@@ -7,61 +7,65 @@ import { MenuGridPreview } from "@/components/menu-grid-preview";
 import { AmbientMixer } from "@/components/ambient-mixer";
 import { CorkboardPreview } from "@/components/corkboard-preview";
 import { Mascot } from "@/components/mascot";
+import { MobileNav } from "@/components/mobile-nav";
 
 export default function Home() {
   return (
     <>
-      <header className="flex items-center justify-between px-8 py-6">
-        <span className="font-display text-lg font-bold tracking-[-0.02em] text-ink">
+      <header className="flex items-center justify-between gap-3 px-4 py-6 sm:px-8">
+        <span className="flex-none font-display text-lg font-bold tracking-[-0.02em] text-ink">
           Depresso
         </span>
         <div className="flex items-center gap-3">
           <PeriodSwitcher />
-          <Link
-            href="/menu"
-            aria-label="Menu"
-            title="Menu"
-            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
-          >
-            <UtensilsCrossed size={13} />
-            Menu
-          </Link>
-          <Link
-            href="/queue"
-            aria-label="Pickup screen"
-            title="Pickup screen"
-            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
-          >
-            <Coffee size={13} />
-            Queue
-          </Link>
-          <Link
-            href="/corkboard"
-            aria-label="Corkboard"
-            title="Corkboard"
-            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
-          >
-            <Pin size={13} />
-            Corkboard
-          </Link>
-          <Link
-            href="/case-study"
-            aria-label="Case study"
-            title="Case study"
-            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
-          >
-            <FileText size={13} />
-            Case study
-          </Link>
-          <Link
-            href="/admin"
-            aria-label="Admin"
-            title="Admin"
-            className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
-          >
-            <KeyRound size={13} />
-            Admin
-          </Link>
+          <div className="hidden items-center gap-3 lg:flex">
+            <Link
+              href="/menu"
+              aria-label="Menu"
+              title="Menu"
+              className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+            >
+              <UtensilsCrossed size={13} />
+              Menu
+            </Link>
+            <Link
+              href="/queue"
+              aria-label="Pickup screen"
+              title="Pickup screen"
+              className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+            >
+              <Coffee size={13} />
+              Queue
+            </Link>
+            <Link
+              href="/corkboard"
+              aria-label="Corkboard"
+              title="Corkboard"
+              className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+            >
+              <Pin size={13} />
+              Corkboard
+            </Link>
+            <Link
+              href="/case-study"
+              aria-label="Case study"
+              title="Case study"
+              className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+            >
+              <FileText size={13} />
+              Case study
+            </Link>
+            <Link
+              href="/admin"
+              aria-label="Admin"
+              title="Admin"
+              className="flex items-center gap-1.5 rounded-md border border-line bg-surface px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-3 transition-colors duration-base hover:text-ink-2"
+            >
+              <KeyRound size={13} />
+              Admin
+            </Link>
+          </div>
+          <MobileNav />
         </div>
       </header>
       <main

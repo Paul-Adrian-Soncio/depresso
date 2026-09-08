@@ -34,9 +34,9 @@ export function PageHeader({
     <div className="flex flex-none flex-col gap-3 self-start">
       {backHref && <BackLink href={backHref} label={backLabel} />}
       <div className="grid grid-cols-[auto_1fr] items-stretch gap-4">
-        <Mascot className="h-full w-auto" />
+        <Mascot className="h-full max-h-24 w-auto sm:max-h-none" />
         <div className="flex flex-col justify-center gap-2">
-          <h1 className="whitespace-nowrap text-[30px] font-bold tracking-[-0.025em] text-ink">
+          <h1 className="text-[30px] font-bold tracking-[-0.025em] text-ink sm:whitespace-nowrap">
             {title}
           </h1>
           {description && (
