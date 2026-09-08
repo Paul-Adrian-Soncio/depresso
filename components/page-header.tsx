@@ -24,19 +24,28 @@ export function PageHeader({
   description,
   backHref,
   backLabel,
+  compact,
 }: {
   title: string;
   description?: string;
   backHref?: string;
   backLabel?: string;
+  /** Shrinks the mascot/title/description on mobile so this fits inline
+   * next to something else in the same row (e.g. CartDrawer on /menu)
+   * instead of needing to stack below it. */
+  compact?: boolean;
 }) {
   return (
     <div className="flex flex-none flex-col gap-3 self-start">
       {backHref && <BackLink href={backHref} label={backLabel} />}
       <div className="grid grid-cols-[auto_1fr] items-stretch gap-4">
-        <Mascot className="h-full max-h-24 w-auto sm:max-h-none" />
-        <div className="flex flex-col justify-center gap-2">
-          <h1 className="text-[30px] font-bold tracking-[-0.025em] text-ink sm:whitespace-nowrap">
+        <Mascot className={`h-full w-auto sm:max-h-none ${compact ? "max-h-20" : "max-h-24"}`} />
+        <div className="flex flex-col justify-center gap-1 sm:gap-2">
+          <h1
+            className={`font-bold tracking-[-0.025em] text-ink sm:whitespace-nowrap ${
+              compact ? "text-2xl sm:text-[30px]" : "text-[30px]"
+            }`}
+          >
             {title}
           </h1>
           {description && (
