@@ -79,9 +79,9 @@ export default function Home() {
         <HeroScene className="w-full max-w-2xl flex-1 rounded-md border border-line" />
       </main>
       <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-[22px] px-8 pb-24">
-        <div className="flex items-baseline justify-between gap-4">
-          <div className="flex items-baseline gap-4">
-            <h2 className="text-[30px] font-bold tracking-[-0.025em] text-ink">
+        <div className="flex items-center justify-between gap-4 sm:items-baseline">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+            <h2 className="whitespace-nowrap text-[30px] font-bold tracking-[-0.025em] text-ink">
               On today
             </h2>
             <p className="font-mono text-xs text-ink-3">The full menu, nine drinks</p>
@@ -96,9 +96,9 @@ export default function Home() {
         <MenuGridPreview />
       </section>
       <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-[22px] px-8 pb-24">
-        <div className="flex items-baseline justify-between gap-4">
-          <div className="flex items-baseline gap-4">
-            <h2 className="text-[30px] font-bold tracking-[-0.025em] text-ink">
+        <div className="flex items-center justify-between gap-4 sm:items-baseline">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+            <h2 className="whitespace-nowrap text-[30px] font-bold tracking-[-0.025em] text-ink">
               The corkboard
             </h2>
             <p className="font-mono text-xs text-ink-3">Whatever people leave behind</p>
