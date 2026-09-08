@@ -21,8 +21,8 @@ export function SiteHeader() {
         className="flex flex-none items-center gap-2 text-ink transition-colors duration-base hover:text-ink-2"
       >
         <ArrowLeft size={16} className="flex-none text-ink-3" />
-        <MascotMark className="h-6 w-6 flex-none" />
-        <span className="hidden font-display text-lg font-bold tracking-[-0.02em] sm:inline">
+        <MascotMark className="h-7 w-7 flex-none" />
+        <span className="font-display text-base font-bold tracking-[-0.02em] sm:text-lg">
           Depresso
         </span>
       </Link>
