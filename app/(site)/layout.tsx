@@ -3,6 +3,8 @@ import { PeriodProvider } from "@/components/period-provider";
 import { PeriodSync } from "@/components/period-sync";
 import { SiteFooter } from "@/components/site-footer";
 import { CartProvider } from "@/components/cart-provider";
+import { DevModeProvider } from "@/components/dev-mode-provider";
+import { DevModeBadge } from "@/components/dev-mode-badge";
 
 /**
  * The live time-of-day system (PeriodProvider, PeriodSync) is scoped to
@@ -25,12 +27,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <PeriodProvider initial={period}>
       <CartProvider>
-        <a href="#main-content" className="skip-link">
-          Skip to content
-        </a>
-        <PeriodSync hasCookie={hasCookie} />
-        {children}
-        <SiteFooter />
+        <DevModeProvider>
+          <a href="#main-content" className="skip-link">
+            Skip to content
+          </a>
+          <PeriodSync hasCookie={hasCookie} />
+          {children}
+          <SiteFooter />
+          <DevModeBadge />
+        </DevModeProvider>
       </CartProvider>
     </PeriodProvider>
   );

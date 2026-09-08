@@ -819,6 +819,65 @@ post, which is what surfaced needing to distinguish "rate-limited" from
 never touched by any of this — every test note was identified and removed
 by exact id.
 
+### 2026-09-08 — Dev-mode overlay built
+A hidden toggle (footer, next to the lofi player — the header nav was
+already crowded) that annotates the live public site with what's actually
+powering each piece: component kind (Server/Client Component/Server
+Action), the exact function and file backing it, and at a handful of
+spots, the architectural decision behind the code. The goal is an inline,
+interactive walkthrough of the app's own architecture that a reviewer can
+poke at directly, rather than relying only on `/case-study` and the
+README.
+
+**Scope: public site only, same as the player and cart.** `DevModeProvider`
+is mounted in `app/(site)/layout.tsx`, not the root layout — `/admin` never
+sees it, matching how the persistent player is deliberately excluded from
+admin. The analytics page was considered and cut: it's `/admin`-only, and
+already states "Computed in SQL" directly in its own copy, so the overlay
+mechanic would add nothing a visitor there can't already read.
+
+**Mechanics:** `useDevMode` (localStorage-persisted boolean, same
+hydration-safe pattern as `useCart`/`useAmbience`) behind a Context
+(`DevModeProvider`, mirrors `CartProvider`'s shape exactly). The core piece
+is `DevAnnotation` — a client wrapper that renders children untouched when
+off (zero DOM/style cost, safe to use broadly) and, when on, adds a dashed
+outline plus a hover/focus mono tooltip. Outline and tooltip color are
+keyed by `kind` and reuse the existing palette tokens (`--cool` for Server
+Component, `--accent` for Client Component, `--ok` for Server Action, no
+fifth color scale invented) — the tooltip chip itself uses fixed dark
+colors regardless of period, since it needs to stay legible against all
+four themes rather than blend into the current one.
+
+**Annotated surfaces (first pass):** menu cards on both `/menu`
+(`MenuCard`, client) and the homepage preview (`MenuGridPreview` wrapping
+`MenuCardPreview`, server) — deliberately showing the same `getMenu()` data
+source labeled with two different `kind`s, since that's a true and useful
+distinction, not a cosmetic one. Checkout (`checkout()`, the ~1-in-8
+simulated decline odds, and the `deduct_stock_for_order()` RPC folded into
+the same annotation rather than double-outlining the same button). Order
+status (`polls every 2.5s`, compressed-time note) and its cancelled-order
+message (the literal visible effect of the stock race-guard rejecting an
+order). Corkboard's post form (rate limit window and IP-keying).
+
+**A real, unrelated bug found and fixed along the way:** verifying card
+outlines exposed that `/menu` cards were different heights per row — the
+"25th Hour" card's longer description made its row visibly taller. Root
+cause was upstream of dev-mode entirely: `MenuCardShell` had no `h-full`
+and its description `<p>` didn't flex-grow, so cards sized to their own
+content instead of stretching to fill their (already-equal-height) CSS
+grid cell. Fixed with `h-full` down the `MenuCard` → `MenuCardShell` chain
+and `flex-1` on the description line so price aligns at a consistent
+baseline regardless of description length — `DevAnnotation`'s own wrapper
+also got `h-full` so toggling dev mode on doesn't reintroduce the same
+mismatch.
+
+**Verified live:** build and lint clean; Playwright confirmed the badge is
+absent by default, appears on toggle, survives a reload (localStorage) and
+client-side navigation, that `/admin` never renders it, that both
+`SERVER COMPONENT` and `CLIENT COMPONENT` labels render correctly and
+match the real component boundary, and that card heights are now equal
+within each grid row.
+
 ---
 
 ## Open
@@ -830,22 +889,23 @@ landed — the "second loop" question is answered in practice, just never
 formally closed here. Leaving this entry as a pointer rather than deleting
 it, since it's the historical record of why those got picked.
 
-### Pending work snapshot — 2026-09-04
-Replaces the 2026-09-02 snapshot, which was stale (order queue display,
-Staff POS, and the spacebar shortcut it listed have all since shipped).
+### Pending work snapshot — 2026-09-08
+Replaces the 2026-09-04 snapshot, which was stale (corkboard guestbook and
+the dev-mode overlay have both since shipped).
 
-**Every "Proposed — operations layer" item is now done:** inventory &
-recipes, order queue display (`/queue`), Staff POS (`/admin/pos`),
-simulation mode. The full order-ahead flow (cart → checkout → live order
-status) is built and verified end to end. Genuinely nothing small or
-self-contained left unbuilt from the working list.
+**Every "Proposed — operations layer" item is done**, and so is every
+Tier 02 item except one: inventory & recipes, order queue display
+(`/queue`), Staff POS (`/admin/pos`), simulation mode, corkboard guestbook
+(`/corkboard`) are all built and verified. The full order-ahead flow
+(cart → checkout → live order status) is built and verified end to end.
 
-**Unpicked Tier 02 items** (optional — already well past "pick two or
-three" with what's built): loyalty stamp card, corkboard guestbook.
+**Unpicked, genuinely optional:** loyalty stamp card — the one remaining
+item from Tier 02 that was never picked up.
 
-**Tier 03, gated behind a feature freeze:** case study — ✅ done
-(`/case-study`); demo reset — ✅ done (`/admin/reset`); dev-mode overlay,
-performance & a11y report, README all still open.
+**Tier 03:** case study — ✅ done (`/case-study`); demo reset — ✅ done, at
+`/admin/admincontrols`; dev-mode overlay — ✅ done. Performance & a11y
+report and the README are the only unbuilt items left anywhere in the
+backlog.
 
 ### When to freeze?
 **Trigger: not answerable yet — but hold onto it.** Worth actively

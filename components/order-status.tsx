@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
+import { DevAnnotation } from "@/components/dev-annotation";
 import type { QueueOrder } from "@/lib/db/orders";
 
 const STAGES: { status: QueueOrder["status"]; label: string }[] = [
@@ -60,6 +61,11 @@ export function OrderStatus({ initialOrder }: { initialOrder: QueueOrder }) {
   const currentIndex = STAGE_INDEX[order.status];
 
   return (
+    <DevAnnotation
+      kind="client-component"
+      label="polls /api/order/[id] every 2.5s"
+      detail="compressed time: Received → Brewing → Ready in ~40s (real order ~8min)"
+    >
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-accent-text">
@@ -71,10 +77,16 @@ export function OrderStatus({ initialOrder }: { initialOrder: QueueOrder }) {
       </div>
 
       {order.status === "cancelled" ? (
-        <p className="rounded-md border border-line bg-surface p-4 font-body text-sm text-ink-2">
-          Something in this order ran out of stock right as it was placed —
-          it never made it to the queue, and nothing was charged.
-        </p>
+        <DevAnnotation
+          kind="server-action"
+          label="deduct_stock_for_order() RPC — SELECT ... FOR UPDATE"
+          detail="race-safe: concurrent orders for the last unit can't both succeed"
+        >
+          <p className="rounded-md border border-line bg-surface p-4 font-body text-sm text-ink-2">
+            Something in this order ran out of stock right as it was placed —
+            it never made it to the queue, and nothing was charged.
+          </p>
+        </DevAnnotation>
       ) : (
         <div className="flex items-center gap-2">
           {STAGES.map((stage, i) => {
@@ -127,5 +139,6 @@ export function OrderStatus({ initialOrder }: { initialOrder: QueueOrder }) {
         </div>
       </div>
     </div>
+    </DevAnnotation>
   );
 }

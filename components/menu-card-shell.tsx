@@ -25,7 +25,7 @@ export function MenuCardShell({
 
   return (
     <div
-      className={`flex flex-col gap-[10px] rounded-[5px] border p-[22px] transition-transform duration-base ${
+      className={`flex h-full flex-col gap-[10px] rounded-[5px] border p-[22px] transition-transform duration-base ${
         unavailable
           ? "border-line bg-surface-2 opacity-55"
           : "border-line-strong bg-surface hover:z-10 hover:scale-[1.03] hover:shadow-lg"
@@ -48,7 +48,7 @@ export function MenuCardShell({
       >
         {item.name}
       </p>
-      <p className={`font-body text-[15px] leading-[1.5] ${unavailable ? "text-ink-3" : "text-ink-2"}`}>
+      <p className={`flex-1 font-body text-[15px] leading-[1.5] ${unavailable ? "text-ink-3" : "text-ink-2"}`}>
         {item.description}
       </p>
       <p className={`pt-[6px] font-mono text-sm tabular-nums ${unavailable ? "text-ink-3" : "text-ink"}`}>

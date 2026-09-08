@@ -48,7 +48,7 @@ item here is chosen because a reviewer can watch the loop close in ten seconds.
 
 | Feature | Tags | Notes |
 |---|---|---|
-| The seed script | `BE` `M` | ✅ **Done.** Three months of orders with plausible names, realistic timestamps, believable weekday/weekend curve. Lives in `supabase/seed.sql` so `db reset` restores it — plus a runtime reset action (`/admin/reset`) sharing the same generator. |
+| The seed script | `BE` `M` | ✅ **Done.** Three months of orders with plausible names, realistic timestamps, believable weekday/weekend curve. Lives in `supabase/seed.sql` so `db reset` restores it — plus a runtime reset action (`/admin/admincontrols`) sharing the same generator. |
 | Admin dashboard | `FS` `L` | ✅ **Done.** CRUD the menu, toggle sold out, watch orders arrive. Admin in one tab, public site in another, flip a drink, watch it grey out. |
 | Order-ahead flow | `FS` `L` | ✅ **Done.** Cart (`/menu`, persisted) → simulated checkout (`/checkout`, name + fake gateway with a low-odds decline and an always-recoverable retry) → live status timeline (`/order/[id]`, polls and auto-advances). Homepage keeps a read-only menu preview ("Order a drink" links out); ordering lives on its own page. Verified end to end against the real database, including a genuine decline/retry. |
 | Loyalty stamp card | `FS` `M` | Auth, persistence and a small rule engine in a very small surface area — a good first backend feature. Seed the demo account at 7 of 10 stamps so the reward is three clicks away. |
@@ -89,7 +89,7 @@ study loses to a plainer one that explains itself.
 | Feature | Tags | Notes |
 |---|---|---|
 | Case study page | `M` | ✅ **Done**, at `/case-study` — also absorbs the "Built using" credits item below rather than shipping as a separate page. Problem, three decisions with tradeoffs (stock race condition, time-of-day system, simulation mode), a real debugging story (the player visualizer's frequency mapping). Linked from the homepage header. |
-| Dev-mode overlay | `FE` `M` | A hidden toggle annotating the live UI with what's underneath: which component, which endpoint, which query. Nerdy, memorable, and it forces you to genuinely understand your own architecture. |
+| Dev-mode overlay | `FE` `M` | ✅ **Done.** Hidden toggle in the footer (next to the lofi player) annotating the live public site with what's underneath — component kind, the exact function/file, and at a few spots the architectural decision behind the code (checkout decline odds + stock race-guard, corkboard rate limiting). Dashed outline colored by kind, reusing existing palette tokens rather than a new color scale; zero cost when off. Scoped to the public site only, same as the player — `/admin` never renders it. |
 | Demo reset | `FS` `S` | ✅ **Done**, at `/admin/admincontrols` — not linked from the admin nav (see `docs/DECISIONS.md`: it's a shared-database action, kept off the surface any reviewer with the demo password could reach). One button restores seed state, freshly regenerated rather than replaying the exact same rows every time. Shares the page with corkboard note moderation. |
 | Performance & a11y report | `S` | Lighthouse numbers and an axe pass in the README with real figures, not a badge. And if the numbers are bad you learn it before an interviewer does. |
 | README that respects the reader | `S` | What it is, how to run it, architecture in one diagram, honest limitations section. The limitations section is what makes the rest believable. |

@@ -1,5 +1,6 @@
 import { Mascot } from "@/components/mascot";
 import { PersistentPlayer } from "@/components/persistent-player";
+import { DevModeTrigger } from "@/components/dev-mode-trigger";
 
 /**
  * Normal in-flow footer, not fixed/sticky — the player lives here rather
@@ -30,7 +31,10 @@ export function SiteFooter() {
             </span>
           </div>
         </div>
-        <PersistentPlayer />
+        <div className="flex w-full items-center gap-3 lg:w-auto">
+          <PersistentPlayer />
+          <DevModeTrigger />
+        </div>
       </div>
     </footer>
   );

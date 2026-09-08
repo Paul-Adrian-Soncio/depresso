@@ -6,6 +6,7 @@ import { RotateCcw } from "lucide-react";
 import { useCartContext } from "@/components/cart-provider";
 import { cartTotalCents } from "@/lib/domain/cart";
 import { checkout } from "@/app/(site)/checkout/actions";
+import { DevAnnotation } from "@/components/dev-annotation";
 
 function formatPrice(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
@@ -68,6 +69,11 @@ export function CheckoutForm() {
   }
 
   return (
+    <DevAnnotation
+      kind="server-action"
+      label="checkout() — app/(site)/checkout/actions.ts"
+      detail="~12.5% simulated decline (1-in-8) · stock deducted via deduct_stock_for_order() RPC, SELECT ... FOR UPDATE"
+    >
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3 rounded-md border border-line bg-surface p-4">
         {cart.map((line) => (
@@ -132,5 +138,6 @@ export function CheckoutForm() {
         </div>
       )}
     </div>
+    </DevAnnotation>
   );
 }

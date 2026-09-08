@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useCartContext } from "@/components/cart-provider";
 import { MenuCardShell } from "@/components/menu-card-shell";
 import { MenuItemModal } from "@/components/menu-item-modal";
+import { DevAnnotation } from "@/components/dev-annotation";
 import type { MenuItemWithAvailability } from "@/lib/db/menu";
 
 export function MenuCard({ item }: { item: MenuItemWithAvailability }) {
@@ -22,33 +23,39 @@ export function MenuCard({ item }: { item: MenuItemWithAvailability }) {
 
   return (
     <>
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => !unavailable && setModalOpen(true)}
-        onKeyDown={(event) => {
-          if (unavailable) return;
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setModalOpen(true);
-          }
-        }}
-        aria-label={`View ${item.name}`}
-        className={unavailable ? "" : "cursor-pointer"}
+      <DevAnnotation
+        kind="client-component"
+        label="getMenu() — lib/db/menu.ts"
+        detail="sold_out: item.isSoldOut (stored) OR outOfStock (derived from stock_quantity)"
       >
-        <MenuCardShell item={item}>
-          <button
-            type="button"
-            onClick={handleAdd}
-            aria-label={`Add ${item.name} to cart`}
-            className={`flex h-7 w-7 flex-none items-center justify-center rounded-full transition-colors duration-base ${
-              justAdded ? "bg-ok text-on-accent" : "bg-accent text-on-accent hover:opacity-90"
-            }`}
-          >
-            {justAdded ? <Check size={14} /> : <Plus size={14} />}
-          </button>
-        </MenuCardShell>
-      </div>
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => !unavailable && setModalOpen(true)}
+          onKeyDown={(event) => {
+            if (unavailable) return;
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setModalOpen(true);
+            }
+          }}
+          aria-label={`View ${item.name}`}
+          className={`h-full ${unavailable ? "" : "cursor-pointer"}`}
+        >
+          <MenuCardShell item={item}>
+            <button
+              type="button"
+              onClick={handleAdd}
+              aria-label={`Add ${item.name} to cart`}
+              className={`flex h-7 w-7 flex-none items-center justify-center rounded-full transition-colors duration-base ${
+                justAdded ? "bg-ok text-on-accent" : "bg-accent text-on-accent hover:opacity-90"
+              }`}
+            >
+              {justAdded ? <Check size={14} /> : <Plus size={14} />}
+            </button>
+          </MenuCardShell>
+        </div>
+      </DevAnnotation>
 
       {modalOpen && !unavailable && (
         <MenuItemModal item={item} onClose={() => setModalOpen(false)} />

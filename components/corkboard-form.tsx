@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { postNote } from "@/app/(site)/corkboard/actions";
+import { DevAnnotation } from "@/components/dev-annotation";
 
 const MAX_LENGTH = 280;
 
@@ -54,6 +55,11 @@ export function CorkboardForm() {
   }
 
   return (
+    <DevAnnotation
+      kind="server-action"
+      label="postNote() — lib/db/corkboard.ts"
+      detail="rate-limited server-side, IP-keyed, 3 min window"
+    >
     <div className="flex flex-col gap-3 rounded-md border border-line bg-surface p-4">
       <label className="flex flex-col gap-1.5">
         <span className="font-mono text-xs uppercase tracking-[0.1em] text-ink-3">
@@ -96,5 +102,6 @@ export function CorkboardForm() {
         {isPending ? "Pinning…" : "Pin it"}
       </button>
     </div>
+    </DevAnnotation>
   );
 }
