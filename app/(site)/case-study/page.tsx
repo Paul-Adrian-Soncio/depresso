@@ -1,5 +1,5 @@
 import { PLAYLIST } from "@/lib/domain/playlist";
-import { BackLink } from "@/components/back-link";
+import { SiteHeader } from "@/components/site-header";
 
 interface CreditEntry {
   name: string;
@@ -86,9 +86,10 @@ function CreditRow({ name, detail, href }: CreditEntry) {
 
 export default function CaseStudyPage() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-16 px-8 py-16">
+    <>
+      <SiteHeader />
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-16 px-8 py-16">
       <div className="flex flex-col gap-6">
-        <BackLink />
         <div className="flex flex-col gap-3">
           <p className="font-mono text-xs uppercase tracking-[0.16em] text-accent-text">
             Case study
@@ -305,6 +306,7 @@ export default function CaseStudyPage() {
           ))}
         </div>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
