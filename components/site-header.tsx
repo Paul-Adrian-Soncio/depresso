@@ -17,11 +17,12 @@ export function SiteHeader() {
     <header className="flex items-center justify-between gap-3 px-4 py-6 sm:px-8">
       <Link
         href="/"
-        aria-label="Back to the site"
         className="flex flex-none items-center gap-2 text-ink transition-colors duration-base hover:text-ink-2"
       >
-        <ArrowLeft size={16} className="flex-none text-ink-3" />
-        <MascotMark className="h-7 w-7 flex-none" />
+        <ArrowLeft size={16} className="flex-none text-ink-3" aria-hidden="true" />
+        <span aria-hidden="true">
+          <MascotMark className="h-7 w-7 flex-none" />
+        </span>
         <span className="font-display text-base font-bold tracking-[-0.02em] sm:text-lg">
           Depresso
         </span>

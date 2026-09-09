@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# static design mockups — reference for building the UI, not production code
+# or something a reviewer needs to see (see docs/reference note in CLAUDE.md)
+/docs/reference/

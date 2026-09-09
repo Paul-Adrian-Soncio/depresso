@@ -88,7 +88,7 @@ export default function CaseStudyPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-16 px-8 py-16">
+      <main id="main-content" className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-16 px-8 py-16">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
           <p className="font-mono text-xs uppercase tracking-[0.16em] text-accent-text">

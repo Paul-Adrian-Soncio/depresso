@@ -10,7 +10,7 @@ export default async function CorkboardPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-8 px-8 py-16">
+      <main id="main-content" className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-8 px-8 py-16">
         <PageHeader
           title="The corkboard"
           description="Whatever people leave behind. No account needed — pin something and it's up right away."

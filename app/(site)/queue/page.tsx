@@ -9,7 +9,7 @@ export default async function QueuePage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-8 px-8 py-16">
+      <main id="main-content" className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-8 px-8 py-16">
         <PageHeader
           title="The pickup screen"
           description="What's brewing and what's ready — same as the screen above the counter. Every order here is real, placed by someone through the menu."

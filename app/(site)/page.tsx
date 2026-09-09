@@ -68,16 +68,14 @@ export default function Home() {
           <MobileNav />
         </div>
       </header>
-      <main
-        id="main-content"
-        className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center gap-16 px-8 py-16 lg:flex-row lg:items-center lg:py-24"
-      >
+      <main id="main-content" className="flex flex-1 flex-col">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-16 px-8 py-16 lg:flex-row lg:items-center lg:py-24">
         <div className="flex w-full max-w-lg flex-none flex-col items-center gap-4 text-center lg:items-start lg:text-left">
           <Mascot className="h-16 w-auto" />
           <HeroCopy />
         </div>
         <HeroScene className="w-full max-w-2xl flex-1 rounded-md border border-line" />
-      </main>
+      </div>
       <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-[22px] px-8 pb-24">
         <div className="flex items-center justify-between gap-4 sm:items-baseline">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
@@ -126,6 +124,7 @@ export default function Home() {
           <AmbientMixer />
         </div>
       </section>
+      </main>
     </>
   );
 }

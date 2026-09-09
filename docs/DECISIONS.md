@@ -878,11 +878,67 @@ client-side navigation, that `/admin` never renders it, that both
 match the real component boundary, and that card heights are now equal
 within each grid row.
 
----
+### 2026-09-10 — Performance & a11y audit run before deploying
+Ran against a production build (`npm run build && npm start`), not dev mode
+— dev mode's unminified bundles and lack of caching skew every performance
+number pessimistically, so it's not representative of what a reviewer
+would actually see. Two tools, deliberately: Lighthouse (Chrome's own
+metrics, mobile + desktop, throttled + unthrottled) and a full axe-core
+pass via Playwright (`@axe-core/playwright`) across every public page —
+axe-core's rule set is broader than the subset Lighthouse's accessibility
+category samples, and it's what actually caught both real bugs below;
+Lighthouse's a11y score didn't move on either fix's page until the axe
+pass found them.
 
-## Open
+**Final scores, every public page (`/`, `/menu`, `/checkout`, `/corkboard`,
+`/queue`, `/case-study`):** accessibility 100, best-practices 100, SEO 100.
+Performance: high-80s to high-90s on Lighthouse's simulated-mobile preset
+(slow 4G-ish throttling, 4x CPU slowdown — the honest worst case), 98–100
+on desktop. Zero axe-core violations anywhere after the fixes below.
 
-### Which second backend loop?
+**Two real bugs found and fixed, not just number-chasing:**
+1. **Skip link pointed nowhere on 6 of 7 public pages.** The skip link
+   (`<a href="#main-content">`, `(site)/layout.tsx`) is shared across every
+   public page, but only the homepage's `<main>` actually had
+   `id="main-content"` — every other page's skip link was a dead link.
+   Added the id to all six remaining `<main>` elements.
+2. **`label-content-name-mismatch` (Deque/axe rule) on two elements.**
+   `SiteHeader`'s logo link had `aria-label="Back to the site"` while its
+   visible text read "Depresso" — a screen reader announced something a
+   sighted user reading along wouldn't hear said. Fixed by dropping the
+   override entirely and letting the link's own visible content (icon +
+   mascot mark, both now `aria-hidden`, + "Depresso" text) form the
+   accessible name naturally. Same root cause on `MenuCard`'s clickable
+   card wrapper (`aria-label="View X"` vs. the full visible card text) —
+   same fix, drop the override.
+3. **`nested-interactive` (serious, axe) on every menu card.** `MenuCard`'s
+   outer `role="button"` div wrapped a real `<button>` (the add-to-cart
+   control) — nested interactive elements confuse screen reader and
+   keyboard navigation regardless of whether the click handlers
+   technically still work. Restructured to siblings instead of nesting: an
+   invisible full-card `<button>` for "view details" sits underneath, and
+   `MenuCardShell`'s wrapper gets `pointer-events-none` so its own box
+   doesn't intercept clicks meant for that button (a later sibling
+   normally hit-tests on top regardless of z-index) — the add-to-cart
+   button re-enables `pointer-events-auto` on itself so it's independently
+   clickable through that hole. Verified with a live Playwright check
+   (not just the axe pass) that both click targets still do the right
+   thing: add-to-cart doesn't open the modal, the card body does, and the
+   cart still updates.
+4. **Homepage `region` violation (moderate, axe).** The three feature
+   sections (menu preview, corkboard preview, ambient mixer) sat as
+   siblings after `</main>` closed, not inside any landmark — only the
+   hero was inside `<main>`. Extended `<main>` to wrap the whole page
+   instead of just the hero.
+
+**What performance's LCP number is actually measuring:** the homepage's
+LCP element is the hero `<h1>` text itself, not an image — there's no
+heavy asset to blame. The mobile-preset LCP (~3.3s in one run) is mostly
+simulated network latency (Lighthouse's mobile throttling profile adds
+~560ms of simulated request latency per hop), not a real bottleneck in
+the code; the desktop preset's LCP for the same page is ~0.7s. Recorded
+honestly rather than chasing a number that's mostly measuring the
+throttling profile.
 **Resolved by what shipped, not by a fresh decision.** The admin dashboard
 (mandatory) plus inventory/recipes, simulation mode, and demo reset all
 landed — the "second loop" question is answered in practice, just never
