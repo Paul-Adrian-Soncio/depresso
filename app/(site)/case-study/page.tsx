@@ -26,6 +26,13 @@ const AMBIENT_TRACKS: CreditEntry[] = [
   { name: "Espresso machine", detail: "Ambient loop" },
 ];
 
+const CONTACT: CreditEntry[] = [
+  { name: "Email", detail: "pauladrian.soncio@gmail.com", href: "mailto:pauladrian.soncio@gmail.com" },
+  { name: "LinkedIn", detail: "Work history, recommendations", href: "https://www.linkedin.com/in/pauladriansoncio/" },
+  { name: "GitHub", detail: "This repo and others", href: "https://github.com/Paul-Adrian-Soncio" },
+  { name: "Portfolio", detail: "More projects", href: "https://paul-adrian.vercel.app" },
+];
+
 function Decision({
   number,
   title,
@@ -348,6 +355,22 @@ export default function CaseStudyPage() {
         </p>
         <div className="flex flex-col divide-y divide-line rounded-md border border-line bg-surface">
           {AMBIENT_TRACKS.map((entry) => (
+            <CreditRow key={entry.name} {...entry} />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <h2 className="text-2xl font-bold tracking-[-0.02em] text-ink">
+          Who built this
+        </h2>
+        <p className="font-body text-[15px] leading-relaxed text-ink-2">
+          Everything above is simulated. The person who built it is not.
+          I&apos;m Paul, a frontend developer moving into fullstack, and I&apos;m
+          currently open to work.
+        </p>
+        <div className="flex flex-col divide-y divide-line rounded-md border border-accent bg-surface">
+          {CONTACT.map((entry) => (
             <CreditRow key={entry.name} {...entry} />
           ))}
         </div>
