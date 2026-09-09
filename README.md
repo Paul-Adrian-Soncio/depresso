@@ -8,7 +8,7 @@ placed by a demo. That constraint is the point: the project exists to
 demonstrate fullstack ability, specifically a real backend under a polished
 frontend, not to sell coffee.
 
-**Live demo:** _add the deployed URL here after pushing to Vercel_
+**Live demo:** [depresso.vercel.app](https://depresso.vercel.app)
 **Case study:** [`/case-study`](app/(site)/case-study/page.tsx). The design
 decisions, tradeoffs, and a real debugging story, written up in more depth
 than this file.
