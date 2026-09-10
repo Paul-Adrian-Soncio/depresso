@@ -1,109 +1,146 @@
+"use client";
+
+import { usePeriodContext } from "@/components/period-provider";
+
 /**
- * The hero window scene: a room, a rain-streaked window onto a lit
- * apartment building, a pendant lamp, a cup on the table, a plant. Rebuilt
- * from docs/reference/homepage-*.html using only the documented design
- * tokens (--ground/--surface/--ink/--accent/etc.) rather than that
- * mockup's bespoke per-period hex values — see DECISIONS.md. Re-lights
- * automatically across all four periods.
+ * The hero window scene: a room, a window onto a lit apartment building
+ * (blurred, sitting back from the glass for depth), a pendant lamp, a cup
+ * on the table, a plant. Rebuilt from docs/reference/homepage-*.html using
+ * only the documented design tokens rather than that mockup's bespoke
+ * per-period hex values — see DECISIONS.md. Re-lights automatically across
+ * all four periods.
+ *
+ * The lamp is only lit at dusk/late — during the day there's no reason for
+ * a pendant lamp over a table to be on, so its cord and shade stay present
+ * as objects but the warm glow, bulb, and lit-window squares switch off.
+ * This needs the *current* period as data (not just CSS reacting to
+ * `[data-period]`), so unlike most presentational components this one is a
+ * Client Component reading `usePeriodContext()`, the same pattern
+ * `HeroCopy` already uses for period-dependent copy.
+ *
+ * Animated rain (looping SVG line offsets) and cup steam were both tried
+ * and dropped: a dozen individual streaks re-looping on a short cycle read
+ * as an obvious, juddery repeat rather than real rain, and the steam
+ * competed with the lamp for attention. The lamp's own glow is left to
+ * carry the scene's one bit of motion.
  */
 export function HeroScene({ className }: { className?: string }) {
+  const { period } = usePeriodContext();
+  const lampOn = period === "dusk" || period === "late";
+
   return (
-    <svg viewBox="0 0 700 460" className={className} role="img" aria-label="A rainy window with a lit pendant lamp over a table">
+    <svg
+      viewBox="0 0 700 460"
+      className={className}
+      role="img"
+      aria-label="A window looking out on the street, with a pendant lamp over a table"
+    >
       <defs>
         <radialGradient id="hero-lamp-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.42} />
-          <stop offset="60%" stopColor="var(--accent)" stopOpacity={0.1} />
+          <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.5} />
+          <stop offset="55%" stopColor="var(--accent)" stopOpacity={0.14} />
           <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
         </radialGradient>
         <clipPath id="hero-window-clip">
-          <rect x={92} y={52} width={376} height={250} rx={3} />
+          <rect x={60} y={40} width={460} height={272} rx={4} />
         </clipPath>
+        <filter id="hero-street-blur">
+          <feGaussianBlur stdDeviation="2.2" />
+        </filter>
       </defs>
+
+      <style>
+        {`
+          @media (prefers-reduced-motion: no-preference) {
+            .hero-lamp-glow { animation: hero-breathe 4.2s ease-in-out infinite; transform-origin: 596px 132px; }
+          }
+          @keyframes hero-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        `}
+      </style>
 
       <rect x={0} y={0} width={700} height={460} fill="var(--surface)" />
 
       {/* window: sky is --ground */}
-      <rect x={92} y={52} width={376} height={250} rx={3} fill="var(--ground)" />
+      <rect x={60} y={40} width={460} height={272} rx={4} fill="var(--ground)" />
       <g clipPath="url(#hero-window-clip)">
-        {/* building windows: unlit vs lit, drawn a shade off the sky for separation */}
-        <rect x={100} y={212} width={58} height={90} fill="var(--line-strong)" />
-        <rect x={168} y={178} width={44} height={124} fill="var(--ink-3)" />
-        <rect x={222} y={232} width={70} height={70} fill="var(--line-strong)" />
-        <rect x={302} y={196} width={52} height={106} fill="var(--ink-3)" />
-        <rect x={364} y={242} width={66} height={60} fill="var(--line-strong)" />
-        <rect x={436} y={206} width={40} height={96} fill="var(--ink-3)" />
-        {/* lit window squares */}
-        <rect x={176} y={192} width={8} height={10} fill="var(--accent)" opacity={0.55} />
-        <rect x={192} y={214} width={8} height={10} fill="var(--accent)" opacity={0.3} />
-        <rect x={314} y={210} width={8} height={10} fill="var(--accent)" opacity={0.45} />
-        <rect x={330} y={242} width={8} height={10} fill="var(--accent)" opacity={0.25} />
-        <rect x={446} y={220} width={8} height={10} fill="var(--accent)" opacity={0.35} />
-        <rect x={112} y={238} width={8} height={10} fill="var(--accent)" opacity={0.28} />
-        {/* rain */}
-        <g stroke="var(--ink-3)" strokeWidth={1.6} strokeLinecap="round" opacity={0.55}>
-          <line x1={120} y1={60} x2={106} y2={98} />
-          <line x1={176} y1={48} x2={162} y2={86} />
-          <line x1={238} y1={72} x2={224} y2={110} />
-          <line x1={292} y1={52} x2={278} y2={90} />
-          <line x1={348} y1={80} x2={334} y2={118} />
-          <line x1={402} y1={58} x2={388} y2={96} />
-          <line x1={446} y1={92} x2={432} y2={130} />
-          <line x1={150} y1={140} x2={136} y2={178} />
-          <line x1={268} y1={150} x2={254} y2={188} />
-          <line x1={380} y1={160} x2={366} y2={198} />
-          <line x1={212} y1={212} x2={198} y2={250} />
-          <line x1={424} y1={196} x2={410} y2={234} />
+        {/* street, blurred and set back from the glass for depth */}
+        <g filter="url(#hero-street-blur)" opacity={0.8}>
+          <rect x={70} y={216} width={64} height={96} fill="var(--line-strong)" />
+          <rect x={148} y={180} width={48} height={132} fill="var(--ink-3)" />
+          <rect x={210} y={238} width={76} height={74} fill="var(--line-strong)" />
+          <rect x={300} y={198} width={56} height={114} fill="var(--ink-3)" />
+          <rect x={370} y={248} width={70} height={64} fill="var(--line-strong)" />
+          <rect x={450} y={208} width={44} height={104} fill="var(--ink-3)" />
+        </g>
+        {/* lit windows across the street: dark (unlit look) during the day.
+            `transition` set inline since the global `*` cross-fade rule
+            (globals.css) covers fill/color/border-color/stroke but not
+            opacity, and this opacity swap should ease with the same
+            --duration-period timing as everything else on a period
+            change, not cut instantly. */}
+        <g
+          opacity={lampOn ? 1 : 0}
+          style={{ transition: "opacity var(--duration-period) var(--ease-quiet)" }}
+        >
+          <rect x={160} y={196} width={9} height={11} fill="var(--accent)" opacity={0.6} />
+          <rect x={178} y={220} width={9} height={11} fill="var(--accent)" opacity={0.32} />
+          <rect x={316} y={212} width={9} height={11} fill="var(--accent)" opacity={0.5} />
+          <rect x={336} y={248} width={9} height={11} fill="var(--accent)" opacity={0.26} />
+          <rect x={466} y={224} width={9} height={11} fill="var(--accent)" opacity={0.38} />
+          <rect x={84} y={244} width={9} height={11} fill="var(--accent)" opacity={0.3} />
+          <rect x={404} y={272} width={9} height={11} fill="var(--accent)" opacity={0.42} />
         </g>
       </g>
-      <rect x={92} y={52} width={376} height={250} rx={3} fill="none" stroke="var(--line-strong)" strokeWidth={7} />
-      <line x1={280} y1={52} x2={280} y2={302} stroke="var(--line-strong)" strokeWidth={5} />
-      <line x1={92} y1={177} x2={468} y2={177} stroke="var(--line-strong)" strokeWidth={5} />
+      <rect x={60} y={40} width={460} height={272} rx={4} fill="none" stroke="var(--line-strong)" strokeWidth={7} />
+      <line x1={290} y1={40} x2={290} y2={312} stroke="var(--line-strong)" strokeWidth={5} />
+      <line x1={60} y1={176} x2={520} y2={176} stroke="var(--line-strong)" strokeWidth={5} />
 
-      {/* pendant lamp */}
-      <circle cx={566} cy={150} r={130} fill="url(#hero-lamp-glow)" />
-      <line x1={566} y1={0} x2={566} y2={104} stroke="var(--line-strong)" strokeWidth={3} />
-      <path d="M 530 138 L 566 104 L 602 138 Z" fill="var(--line-strong)" />
-      <ellipse cx={566} cy={138} rx={36} ry={7} fill="var(--accent)" opacity={0.85} />
+      {/* pendant lamp: glow and bulb opacity ease with --duration-period
+          the same way the lit windows above do */}
+      <circle
+        className="hero-lamp-glow"
+        cx={596}
+        cy={132}
+        r={152}
+        fill="url(#hero-lamp-glow)"
+        opacity={lampOn ? 1 : 0}
+        style={{ transition: "opacity var(--duration-period) var(--ease-quiet)" }}
+      />
+      <line x1={596} y1={0} x2={596} y2={88} stroke="var(--line-strong)" strokeWidth={3} />
+      <path d="M 556 124 L 596 88 L 636 124 Z" fill="var(--line-strong)" />
+      <ellipse
+        cx={596}
+        cy={124}
+        rx={40}
+        ry={7.5}
+        fill="var(--accent)"
+        opacity={lampOn ? 0.9 : 0.25}
+        style={{ transition: "opacity var(--duration-period) var(--ease-quiet)" }}
+      />
 
       {/* table */}
       <rect x={0} y={368} width={700} height={92} fill="var(--surface-2)" />
       <rect x={0} y={368} width={700} height={4} fill="var(--line-strong)" />
 
       {/* cup */}
-      <ellipse cx={566} cy={370} rx={54} ry={11} fill="var(--surface-2)" />
-      <path d="M 538 330 L 594 330 L 588 366 Q 566 372 544 366 Z" fill="var(--ink)" />
+      <ellipse cx={596} cy={372} rx={56} ry={11} fill="var(--surface-2)" />
+      <path d="M 566 330 L 626 330 L 620 368 Q 596 374 572 368 Z" fill="var(--ink)" />
       <path
-        d="M 594 338 Q 612 342 606 356 Q 602 364 590 362"
+        d="M 626 338 Q 646 342 640 358 Q 636 366 622 364"
         fill="none"
         stroke="var(--ink)"
         strokeWidth={5}
         strokeLinecap="round"
       />
-      <path
-        d="M 552 316 Q 546 302 556 292 Q 564 282 558 270"
-        fill="none"
-        stroke="var(--ink-3)"
-        strokeWidth={2.5}
-        strokeLinecap="round"
-        opacity={0.5}
-      />
-      <path
-        d="M 574 318 Q 580 304 570 294 Q 562 284 570 274"
-        fill="none"
-        stroke="var(--ink-3)"
-        strokeWidth={2.5}
-        strokeLinecap="round"
-        opacity={0.35}
-      />
 
       {/* plant */}
-      <path d="M 70 368 L 78 320 L 116 320 L 124 368 Z" fill="var(--line-strong)" />
-      <path d="M 97 320 Q 74 296 78 262" fill="none" stroke="var(--ok)" strokeWidth={4} strokeLinecap="round" />
-      <path d="M 97 320 Q 118 300 120 272" fill="none" stroke="var(--ok)" strokeWidth={4} strokeLinecap="round" />
-      <path d="M 97 320 Q 98 304 99 286" fill="none" stroke="var(--ok)" strokeWidth={4} strokeLinecap="round" />
-      <ellipse cx={76} cy={256} rx={15} ry={9} fill="var(--ok)" transform="rotate(-32 76 256)" />
-      <ellipse cx={122} cy={266} rx={15} ry={9} fill="var(--ok)" transform="rotate(28 122 266)" />
-      <ellipse cx={99} cy={286} rx={14} ry={8} fill="var(--ok)" transform="rotate(-6 99 286)" />
+      <path d="M 40 368 L 48 320 L 86 320 L 94 368 Z" fill="var(--line-strong)" />
+      <path d="M 67 320 Q 44 296 48 262" fill="none" stroke="var(--ok)" strokeWidth={4} strokeLinecap="round" />
+      <path d="M 67 320 Q 88 300 90 272" fill="none" stroke="var(--ok)" strokeWidth={4} strokeLinecap="round" />
+      <path d="M 67 320 Q 68 304 69 286" fill="none" stroke="var(--ok)" strokeWidth={4} strokeLinecap="round" />
+      <ellipse cx={46} cy={256} rx={15} ry={9} fill="var(--ok)" transform="rotate(-32 46 256)" />
+      <ellipse cx={92} cy={266} rx={15} ry={9} fill="var(--ok)" transform="rotate(28 92 266)" />
+      <ellipse cx={69} cy={286} rx={14} ry={8} fill="var(--ok)" transform="rotate(-6 69 286)" />
     </svg>
   );
 }
