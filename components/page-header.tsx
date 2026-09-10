@@ -14,10 +14,17 @@ import { BackLink } from "@/components/back-link";
  * element, inflated the row's own stretch calculation instead of just
  * following it), which either blew the mascot up to fill the whole page or
  * collapsed both columns on top of each other depending on the wrapper.
- * Grid's `items-stretch` doesn't have that ambiguity: each column gets its
- * own track, the mascot's column simply stretches to the row's real
- * content height, and it can't affect the width of the text column next
- * to it.
+ *
+ * Below `sm` the row uses `items-start` with a fixed mascot height (not
+ * `items-stretch`/a height tied to content) on purpose: a longer
+ * description (e.g. /queue's full sentence vs. /menu's short one) wraps to
+ * more lines on a real phone than Chrome DevTools' mobile emulation showed
+ * during testing — emulation doesn't perfectly reproduce a real device's
+ * font metrics/line-wrapping. A content-linked mascot height silently grew
+ * past what a hand-tuned `max-h` guess was checked against, and the title
+ * block overlapped the content below it. A fixed height can't be thrown
+ * off by text length, so this stays correct regardless of how many lines
+ * a given page's copy happens to wrap to, on any device.
  */
 export function PageHeader({
   title,
@@ -38,8 +45,10 @@ export function PageHeader({
   return (
     <div className="flex flex-none flex-col gap-3 self-start">
       {backHref && <BackLink href={backHref} label={backLabel} />}
-      <div className="grid grid-cols-[auto_1fr] items-stretch gap-4">
-        <Mascot className={`h-full w-auto sm:max-h-none ${compact ? "max-h-20" : "max-h-24"}`} />
+      <div className="grid grid-cols-[auto_1fr] items-start gap-4 sm:items-stretch">
+        <Mascot
+          className={`w-auto sm:h-full sm:max-h-none ${compact ? "h-20" : "h-24"}`}
+        />
         <div className="flex flex-col justify-center gap-1 sm:gap-2">
           <h1
             className={`font-bold tracking-[-0.025em] text-ink sm:whitespace-nowrap ${
